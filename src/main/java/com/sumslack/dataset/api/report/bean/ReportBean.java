@@ -12,7 +12,9 @@ import com.sumslack.dataset.api.report.vo.ReportColVO;
 import com.sumslack.dataset.api.report.vo.ReportLineLabelVO;
 import com.sumslack.dataset.api.report.vo.ReportLineVO;
 
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 
 public class ReportBean implements Serializable{
 	private String id;
@@ -23,6 +25,8 @@ public class ReportBean implements Serializable{
 	private String step;
 	private String dateFormat;
 	private String java;
+	//是否使用java对齐多个数据集中的数据
+	private boolean javaAlignData;
 	private List<ReportLineBean> lines;
 	
 	public List<ReportLineBean> getLines() {
@@ -69,6 +73,12 @@ public class ReportBean implements Serializable{
 		this.step = step;
 	}
 	
+	public boolean isJavaAlignData() {
+		return javaAlignData;
+	}
+	public void setJavaAlignData(boolean javaAlignData) {
+		this.javaAlignData = javaAlignData;
+	}
 	public String getDateFormat() {
 		return dateFormat;
 	}
@@ -85,26 +95,82 @@ public class ReportBean implements Serializable{
 	public void init(Map paramMap) {
 		for(ReportLineBean rlb : this.lines) {
 			try {
-				rlb.init(paramMap);
+				rlb.init(this,paramMap);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
+	
+	/**
+	 * 根据传入的开始日期和结束日期，计算动态列
+	 * @param paramMap
+	 * @return
+	 * @throws Exception
+	 */
 	public List<ReportColVO> getCols(Map paramMap) throws Exception{
 		List<ReportColVO> cols = new ArrayList();
 		String cStartDate = ReportUtil.parseParam(this.startDate, paramMap);
 		String cEndDate = ReportUtil.parseParam(this.endDate, paramMap);
+		//未设置开始时间，那么返回空的动态列
+		if(StrUtil.isEmpty(cStartDate)) {
+			return null;
+		}
+		if(!StrUtil.isEmpty(cStartDate) && StrUtil.isEmpty(cEndDate)) {
+			cEndDate = DateUtil.format(new Date(), "yyyy-MM-dd");
+		}
+		
 		Date _startDate = DateUtil.parse(cStartDate);
 		Date _endDate = DateUtil.parse(cEndDate);
 		if(this.step.equals("day")) {
-			
+			if(_startDate.getTime() < _endDate.getTime()) {
+				long mm = DateUtil.between(_startDate, _endDate, DateUnit.DAY);
+				for(int i=0;i<=mm;i++) {
+					Map map = new HashMap();
+					ReportColVO col = new ReportColVO();
+					if(this.dateFormat!=null) {
+						col.setLabel(DateUtil.format(DateUtil.offsetDay(_startDate, i), this.dateFormat));
+					}else {
+						col.setLabel(DateUtil.format(DateUtil.offsetDay(_startDate, i), "yyyy-MM-dd"));
+					}
+					col.setField(DateUtil.format(DateUtil.offsetDay(_startDate, i), this.dateFormat));
+					cols.add(col);
+				}
+			}
 		}else if(this.step.equals("year")) {
-			
+			if(_startDate.getTime() < _endDate.getTime()) {
+				long mm = DateUtil.betweenYear(_startDate, _endDate, false);
+				for(int i=0;i<=mm;i++) {
+					Map map = new HashMap();
+					ReportColVO col = new ReportColVO();
+					if(this.dateFormat!=null) {
+						col.setLabel(DateUtil.format(DateUtil.offsetMonth(_startDate, 12*i), this.dateFormat));
+					}else {
+						col.setLabel(DateUtil.format(DateUtil.offsetMonth(_startDate, 12*i), "yyyy-MM-dd"));
+					}
+					col.setField(DateUtil.format(DateUtil.offsetMonth(_startDate, 12*i), this.dateFormat));
+					cols.add(col);
+				}
+			}
+		}else if(this.step.equals("week")) {
+			if(_startDate.getTime() < _endDate.getTime()) {
+				long mm = DateUtil.between(_startDate, _endDate, DateUnit.WEEK);
+				for(int i=0;i<=mm;i++) {
+					Map map = new HashMap();
+					ReportColVO col = new ReportColVO();
+					if(this.dateFormat!=null) {
+						col.setLabel(DateUtil.format(DateUtil.offsetWeek(_startDate, i), this.dateFormat));
+					}else {
+						col.setLabel(DateUtil.format(DateUtil.offsetWeek(_startDate, i), "yyyy-MM-dd"));
+					}
+					col.setField(DateUtil.format(DateUtil.offsetWeek(_startDate, i), this.dateFormat));
+					cols.add(col);
+				}
+			}
 		}else {
 			if(_startDate.getTime() < _endDate.getTime()) {
-				long mm = DateUtil.betweenMonth(_startDate, _endDate, true);
-				for(int i=0;i<mm;i++) {
+				long mm = DateUtil.betweenMonth(_startDate, _endDate, false);
+				for(int i=0;i<=mm;i++) {
 					Map map = new HashMap();
 					ReportColVO col = new ReportColVO();
 					if(this.dateFormat!=null) {
@@ -126,11 +192,6 @@ public class ReportBean implements Serializable{
 			ReportLineVO lineVO = new ReportLineVO();
 			ReportLineLabelVO label = new ReportLineLabelVO(line.getId(),line.getLabel(),line.getAlign(),line.getFontWeight());
 			lineVO.setLabel(label);
-			try {
-				line.init(paramMap);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 			lineVO.setData(line.getResultList());
 			rows.add(lineVO);
 		}

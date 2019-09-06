@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.CharacterData;
 
 import com.sumscope.tag.util.StrUtil;
 import com.sumslack.dataset.api.report.bean.ReportBean;
@@ -39,7 +41,7 @@ public class ReportUtil {
 				rp.setStep(StrUtil.formatNullStr(report.getAttribute("step"),"month"));
 				rp.setJava(StrUtil.formatNullStr(report.getAttribute("java")));
 				rp.setDateFormat(StrUtil.formatNullStr(report.getAttribute("dateFormat"),"yyyy-MM"));
-				
+				rp.setJavaAlignData(StrUtil.formatNullStr(report.getAttribute("java-align-data"),"false").equals("true"));
 				List<Element> lines = XmlUtil.getElements(report, "row");
 				if(lines!=null) {
 					List<ReportLineBean> lineList = new ArrayList();
@@ -49,7 +51,7 @@ public class ReportUtil {
 						rl.setLabel(StrUtil.formatNullStr(line.getAttribute("label"),"未知"));
 						rl.setAlign(line.getAttribute("align"));
 						rl.setFontWeight(line.getAttribute("fontWeight"));
-						rl.setSql(line.getNodeValue());
+						rl.setSql(getCDData(line)); 
 						rl.setDs(rp.getDs());
 						lineList.add(rl);
 					}
@@ -79,5 +81,20 @@ public class ReportUtil {
 				return _rb.get();
 		}
 		return null;
+	}
+	
+	public static String getCDData(Element e) {
+	    NodeList list = e.getChildNodes();
+	    String data;
+	    for(int index = 0; index < list.getLength(); index++){
+	        if(list.item(index) instanceof CharacterData){
+	            CharacterData child = (CharacterData) list.item(index);
+	            data = child.getData();
+
+	            if(data != null && data.trim().length() > 0)
+	                return child.getData();
+	        }
+	    }
+	    return "";
 	}
 }

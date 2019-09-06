@@ -1,13 +1,18 @@
 package com.sumslack.dataset.api.report.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.sumscope.tag.sql.TagJDBCInstance;
 import com.sumscope.tag.util.IdWorker;
 import com.sumslack.dataset.api.report.util.ReportUtil;
+import com.sumslack.dataset.api.report.vo.ReportColVO;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 
 public class ReportLineBean implements Serializable{
@@ -58,11 +63,29 @@ public class ReportLineBean implements Serializable{
 	public void setId(String id) {
 		this.id = id;
 	}
-	public void init(Map paramMap) throws Exception{
+	public void init(ReportBean report,Map paramMap) throws Exception{
 		if(this.sql!=null) {
-			this.resultList = TagJDBCInstance.getInstance().queryList(this.ds,
+			List<Map> dataList = TagJDBCInstance.getInstance().queryList(this.ds,
 					ReportUtil.parseParam(this.sql, paramMap),
 					null);
+			if(report.isJavaAlignData()) {
+				if(report!=null) {
+					List<ReportColVO> cols = report.getCols(paramMap);
+					this.resultList = new ArrayList();
+					for(ReportColVO col : cols) {
+						Map m = new HashMap();
+						m.put("field", col.getField());
+						Optional<Map> vv = dataList.stream().filter(s -> {
+							return Convert.toStr(s.get("field")).equals(col.getField());
+						}).findFirst();
+						m.put("v", vv.isPresent()?vv.get().get("v"):null);
+						this.resultList.add(m);
+					}
+				}
+			}else {
+				this.resultList = dataList;
+			}
+			
 		}
 	}
 	
