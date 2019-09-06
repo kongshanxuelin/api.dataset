@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reports ds="default">
+	<report id="EntitiesAnalysis" title="机构活跃度统计" ds="default" startDate="${date}" endDate="${endDate}" step="month" dateFormat="yyyyMM">
+		<row label="Total no. of entities. " align="right" fontWeight="bold">
+			<![CDATA[
+				{call testRetSelect('${date}','${endDate}')}
+			]]>
+		</row>
+		<row label="月新增有效用户" align="right" fontWeight="bold">
+			<![CDATA[
+				select DATE_FORMAT(ga.create_time,'%Y%m') field,
+				count(DISTINCT username) v
+				 from test ga where ga.status=1
+				and ga.create_time between '${date}' and '${endDate}'
+				group by DATE_FORMAT(ga.create_time,'%Y-%m');
+			]]>
+		</row>
+	</report>
+	
+	<report id="TestIndex" title="首页指标结果">
+		<row id="aaa" label="总有效用户数">
+			select count(*) num from test where status=1
+		</row>
+		<row id="bbb" label="总有效用户数">
+			select 1111
+		</row>
+	</report>
+	
+	<report id="reportJava" java="com.sumslack.dataset.api.report.impl.ReportTest" />
+</reports>

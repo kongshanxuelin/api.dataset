@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.sumslack</groupId>
+  <artifactId>dataset.api</artifactId>
+  <packaging>war</packaging>
+  <version>1.0.0</version>
+  <name>JSPTagEx Maven Webapp</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+	<jsptagex.version>1.2.5</jsptagex.version>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+		<dependency>
+		    <groupId>sumscope</groupId>
+		    <artifactId>jsptagex</artifactId>
+		    <version>${jsptagex.version}</version>
+		    <exclusions>
+		    	<exclusion>
+		    		<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+		    	</exclusion>
+		    	<exclusion>
+					<groupId>javax.servlet.jsp</groupId>
+					<artifactId>jsp-api</artifactId>		    	
+		    	</exclusion>
+		    </exclusions>
+	  	</dependency>
+	  	<dependency>
+		    <groupId>cn.hutool</groupId>
+		    <artifactId>hutool-all</artifactId>
+		    <version>4.6.4</version>
+		</dependency>
+	  	<dependency>
+		    <groupId>sumscope</groupId>
+		    <artifactId>plugin-api</artifactId>
+		    <version>1.0.0</version> 	
+	  	</dependency>
+  </dependencies>
+  <repositories>
+  	<repository>
+ 	 	<id>nexus</id>
+        <name>Team Nexus Repository</name>
+        <url>http://maven.idbhost.com/nexus/content/groups/public</url>
+  	</repository>
+  </repositories>
+  <pluginRepositories>
+  	<pluginRepository>
+        <id>nexus-snapshots</id>
+        <name>Team Nexus Repository</name>
+        <url>http://maven.idbhost.com/nexus/content/groups/public</url>
+    </pluginRepository>
+  </pluginRepositories>
+  <build>
+    <finalName>dataset-api</finalName>
+  </build>
+</project>
