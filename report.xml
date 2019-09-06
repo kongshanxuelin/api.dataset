@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <reports ds="default">
-	<report id="avgTemp" title="计算城市平均温度" java-align-data="true" ds="default" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
+	<report id="avgTemp" title="计算城市平均温度" java-align-data="true" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
 		<row label="测试数据1 " align="right" fontWeight="bold">
 			<![CDATA[
 				{call testRetSelect('${date}')}
@@ -15,7 +15,7 @@
 			]]>
 		</row>
 	</report>
-	<report id="testWeek" title="测试动态列周" ds="default" startDate="2019-08-27" endDate="2019-09-01" step="day" dateFormat="yyyyMMdd">
+	<report id="testWeek" title="测试动态列周"  startDate="2019-08-27" endDate="2019-09-01" step="day" dateFormat="yyyyMMdd">
 		<row label="test " align="right" fontWeight="bold">
 			<![CDATA[
 				{call testRetSelect('${date}')}
