@@ -13,3 +13,57 @@
 - 修改配置，增加API接口无需重启服务，实时生效；
 
 <img src='http://h5.sumslack.com/640.png'  alt='preview' />
+
+一个demo的xml文件：
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<reports ds="default">
+	<report id="avgTemp" title="计算城市平均温度" java-align-data="true" ds="default" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
+		<row label="测试数据1 " align="right" fontWeight="bold">
+			<![CDATA[
+				{call testRetSelect('${date}')}
+			]]>
+		</row>
+		<row label="测试数据2" align="right" fontWeight="bold">
+			<![CDATA[			
+				select city field,avg(temp) v 
+				from test_city_temp
+				where dt>='${date}'
+				group by city;
+			]]>
+		</row>
+	</report>
+	<report id="testWeek" title="测试动态列周" ds="default" startDate="2019-08-27" endDate="2019-09-01" step="day" dateFormat="yyyyMMdd">
+		<row label="test " align="right" fontWeight="bold">
+			<![CDATA[
+				{call testRetSelect('${date}')}
+			]]>
+		</row>
+	</report>
+	<report id="testJavaAlignData" title="测试后台对齐数据" java-align-data="true" ds="default" startDate="2019-08-07" endDate="2019-08-09" step="day" dateFormat="yyyyMMdd">
+		<row label="d1">
+			<![CDATA[
+				select DATE_FORMAT(dt,'%Y%m%d') field,temp v from test_city_temp where city = 1
+			]]>
+		</row>
+		<row label="d2">
+			<![CDATA[
+				select DATE_FORMAT(dt,'%Y%m%d') field,temp v from test_city_temp where city = 8
+			]]>
+		</row>
+	</report>
+	
+				
+	<report id="TestIndex" title="首页指标结果">
+		<row id="aaa" label="总有效用户数">
+			select count(*) num from test_city
+		</row>
+		<row id="bbb" label="总有效用户数">
+			select 1111
+		</row>
+	</report>
+	
+	<report id="reportJava" java="com.sumslack.dataset.api.report.impl.ReportTest" />
+</reports>
+```

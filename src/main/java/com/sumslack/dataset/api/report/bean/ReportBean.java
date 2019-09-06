@@ -25,10 +25,18 @@ public class ReportBean implements Serializable{
 	private String step;
 	private String dateFormat;
 	private String java;
+	//指定返回的数据类型，默认为：{cols:[...],rows:[...]}的形式，如果指定为map，则一个report代码一个key
+	private String type; 
 	//是否使用java对齐多个数据集中的数据
 	private boolean javaAlignData;
 	private List<ReportLineBean> lines;
 	
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
 	public List<ReportLineBean> getLines() {
 		return lines;
 	}
@@ -187,14 +195,31 @@ public class ReportBean implements Serializable{
 	}
 	
 	public List<ReportLineVO> returnReportJSON(Map paramMap) {
-		List<ReportLineVO> rows = new ArrayList();
-		for(ReportLineBean line : this.lines) {
-			ReportLineVO lineVO = new ReportLineVO();
-			ReportLineLabelVO label = new ReportLineLabelVO(line.getId(),line.getLabel(),line.getAlign(),line.getFontWeight());
-			lineVO.setLabel(label);
-			lineVO.setData(line.getResultList());
-			rows.add(lineVO);
+		if(StrUtil.isEmpty(this.getType())) {
+			List<ReportLineVO> rows = new ArrayList();
+			for(ReportLineBean line : this.lines) {
+				ReportLineVO lineVO = new ReportLineVO();
+				ReportLineLabelVO label = new ReportLineLabelVO(line.getId(),line.getLabel(),line.getAlign(),line.getFontWeight());
+				lineVO.setLabel(label);
+				lineVO.setData(line.getResultList());
+				rows.add(lineVO);
+			}
+			return rows;
 		}
-		return rows;
+		return null;
+	}
+	
+	public Object returnReportType(Map paramMap) {
+		if(this.getType().equals("map")) {
+			Map retMap = new HashMap();
+			for(ReportLineBean line : this.lines) {
+				ReportLineVO lineVO = new ReportLineVO();
+				if(line.getResultList()!=null && line.getResultList().size()==1) {
+					retMap.put(line.getId(),line.getResultList().get(0));
+				}
+			}
+			return retMap;
+		}
+		return null;
 	}
 }

@@ -40,6 +40,7 @@ public class ReportUtil {
 				rp.setEndDate(StrUtil.formatNullStr(report.getAttribute("endDate")));
 				rp.setStep(StrUtil.formatNullStr(report.getAttribute("step"),"month"));
 				rp.setJava(StrUtil.formatNullStr(report.getAttribute("java")));
+				rp.setType(StrUtil.formatNullStr(report.getAttribute("type")));
 				rp.setDateFormat(StrUtil.formatNullStr(report.getAttribute("dateFormat"),"yyyy-MM"));
 				rp.setJavaAlignData(StrUtil.formatNullStr(report.getAttribute("java-align-data"),"false").equals("true"));
 				List<Element> lines = XmlUtil.getElements(report, "row");

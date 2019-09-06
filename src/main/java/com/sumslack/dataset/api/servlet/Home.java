@@ -44,9 +44,12 @@ public class Home extends AjaxServlet{
 						report.setCols(rb.getCols(HttpUtils.getParamMap(request)));
 					} catch (Exception e) {
 						e.printStackTrace();
+						report.setRet(ReportVO.RET.ERROR);
+						report.setErrMsg("发生错误：" + e.getMessage());
 					}
 				}
 				report.setRows(rb.returnReportJSON(HttpUtils.getParamMap(request)));
+				report.setResult(rb.returnReportType(HttpUtils.getParamMap(request)));
 			}else { //自己实现完整的报表
 				IReport myReport = ReflectUtil.newInstance(rb.getJava());
 				printOut(response, request, JSON.toJSONString(myReport.genReport(rb,HttpUtils.getParamMap(request))));
