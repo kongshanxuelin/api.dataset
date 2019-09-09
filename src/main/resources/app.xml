@@ -69,6 +69,19 @@
 			<property name="timeBetweenEvictionRunsMillis" value="600000" />
 			<property name="minEvictableIdleTimeMillis" value="300000" />
 		</datasource>
+		<datasource dbtype="mysql" name="qb" class="com.alibaba.druid.pool.DruidDataSource">
+			<property name="driver" value="com.mysql.jdbc.Driver" />
+			<property name="url" value="jdbc:mysql://192.168.1.215:3306/prd_sumscopecontract?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true" />
+			<property name="user" value="dev" />
+			<property name="password" value="123456" />
+			
+			<property name="maxActive" value="20" />
+			<property name="maxIdle" value="5" />
+			<property name="minIdle" value="0" />
+			<property name="maxWait" value="100000" />
+			<property name="timeBetweenEvictionRunsMillis" value="600000" />
+			<property name="minEvictableIdleTimeMillis" value="300000" />
+		</datasource>
 	</datasources>
 	<!-- 定义所有结果集，含对结果集操作的SQL语句(按需) -->
 	<datasets>

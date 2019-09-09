@@ -8,10 +8,17 @@
 <script src="<sn:webroot/>/js/codemirror.js"></script>
 <script src="<sn:webroot/>/js/mode/xml/xml.js"></script>
 
-
+<link rel="stylesheet" href="<sn:webroot/>/js/addon/fold/foldgutter.css">
 <link rel="stylesheet" href="<sn:webroot/>/js/addon/hint/show-hint.css">
 <script src="<sn:webroot/>/js/addon/hint/show-hint.js"></script>
 <script src="<sn:webroot/>/js/addon/hint/xml-hint.js"></script>
+
+<script src="<sn:webroot/>/js/addon/fold/foldcode.js"></script>
+<script src="<sn:webroot/>/js/addon/fold/foldgutter.js"></script>
+<script src="<sn:webroot/>/js/addon/fold/xml-fold.js"></script>
+
+<script src="<sn:webroot/>/js/addon/selection/active-line.js"></script>
+<script src="<sn:webroot/>/js/addon/edit/matchtags.js"></script>
 
 <style type="text/css">
 .CodeMirror {
@@ -37,14 +44,39 @@ li {
     border: 1px solid transparent;
     border-radius: .25rem;
 }
+#tip {
+	font-size:12px;
+	color: #155724;
+	margin-left:10px;
+}
+#btnSave {
+    display: inline-block;
+    font-weight: 400;
+    color: #212529;
+    background-color: #ffc107;
+    border-color: #ffc107;
+        border: 1px solid transparent;
+    padding: .175rem .35rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: .25rem;
+        user-select: none;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
 </style>
 </head>
 <body>
-	<p style="margin:5px 20px;">
-		配置文件所在路径：<span class="path">${path }</span>
-		<input style="margin-left:10px;" type="button" id="btnSave" value="保存文件" />
-		<span id="tip"></span>
-	</p>
+	<div style="margin:5px 20px;">
+		<table width="100%">
+			<tr>
+				<td width="50%">配置文件所在路径：<span class="path">${path }</span></td>
+				<td align="right" style="padding-right:10px;">
+					<span id="tip"></span>
+					<input style="margin-left:10px;" type="button" id="btnSave" value="保存 Ctrl+S" />
+				</td>
+			</tr>
+		</table>
+	</div>
 	<div class="warning">
 		注：修改该文件即可通过 <a target="_blank" 
 					href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + "/report/id/xxx" %>'> 
@@ -70,6 +102,7 @@ li {
 					startDate : null,
 					endDate : null,
 					java : null,
+					"java-align-data":["true","false"],
 					step : [ "month", "day", "year", "week" ],
 					dateFormat : [ "yyyyMM", "yyyy-MM", "yyyy-MM-dd",
 							"yyyyMMdd", "yyyy/MM/dd", "yyyy/MM" ]
@@ -141,7 +174,15 @@ li {
 			});
 		}
 		var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+			lineWrapping: true,
+			firstLineNumber: 1,
+			autofocus: true,
 			lineNumbers : true,
+			styleActiveLine: true,
+			matchTags: {bothTags: true},
+			showCursorWhenSelecting:true,
+			foldGutter: true,
+			gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
 			mode : "xml",
 			extraKeys : {
 				"'<'" : completeAfter,
@@ -157,7 +198,7 @@ li {
 				schemaInfo : tags
 			}
 		});
-		editor.setSize('100%', '90%');
+		editor.setSize('100%', (document.body.clientHeight-120) + 'px');
 		
 		$(function(){
 			$("#btnSave").bind("click",function(){
