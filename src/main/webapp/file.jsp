@@ -42,6 +42,8 @@ li {
 <body>
 	<p style="margin:5px 20px;">
 		配置文件所在路径：<span class="path">${path }</span>
+		<input style="margin-left:10px;" type="button" id="btnSave" value="保存文件" />
+		<span id="tip"></span>
 	</p>
 	<div class="warning">
 		注：修改该文件即可通过 <a target="_blank" 
@@ -117,6 +119,27 @@ li {
 						return inner.tagName;
 					});
 		}
+		function saveFile(){
+			$.ajax({
+				type:"post",
+				url:"<sn:webroot/>/report/file/save",
+				data:{
+					content:editor.getValue()
+				},
+				success:function(json){
+					if(json.ret ==0){
+						editor.setValue(json.c);
+						var ss  = new Date();
+						$("#tip").html("保存于：" + ss.getHours() + ":" + ss.getMinutes() + ":" + ss.getSeconds());
+					}else{
+						alert(json.msg);
+					}
+				},
+				error:function(){
+					
+				}
+			});
+		}
 		var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 			lineNumbers : true,
 			mode : "xml",
@@ -125,13 +148,22 @@ li {
 				"'/'" : completeIfAfterLt,
 				"' '" : completeIfInTag,
 				"'='" : completeIfInTag,
-				"Ctrl-Space" : "autocomplete"
+				"Ctrl-Space" : "autocomplete",
+				"Ctrl-S":function(){
+					saveFile();
+				}
 			},
 			hintOptions : {
 				schemaInfo : tags
 			}
 		});
 		editor.setSize('100%', '90%');
+		
+		$(function(){
+			$("#btnSave").bind("click",function(){
+				saveFile();
+			});
+		});
 	</script>
 </body>
 </html>
