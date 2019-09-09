@@ -195,18 +195,15 @@ public class ReportBean implements Serializable{
 	}
 	
 	public List<ReportLineVO> returnReportJSON(Map paramMap) {
-		if(StrUtil.isEmpty(this.getType())) {
-			List<ReportLineVO> rows = new ArrayList();
-			for(ReportLineBean line : this.lines) {
-				ReportLineVO lineVO = new ReportLineVO();
-				ReportLineLabelVO label = new ReportLineLabelVO(line.getId(),line.getLabel(),line.getAlign(),line.getFontWeight());
-				lineVO.setLabel(label);
-				lineVO.setData(line.getResultList());
-				rows.add(lineVO);
-			}
-			return rows;
+		List<ReportLineVO> rows = new ArrayList();
+		for(ReportLineBean line : this.lines) {
+			ReportLineVO lineVO = new ReportLineVO();
+			ReportLineLabelVO label = new ReportLineLabelVO(line.getId(),line.getLabel(),line.getAlign(),line.getFontWeight());
+			lineVO.setLabel(label);
+			lineVO.setData(line.getResultList());
+			rows.add(lineVO);
 		}
-		return null;
+		return rows;
 	}
 	
 	public Object returnReportType(Map paramMap) {

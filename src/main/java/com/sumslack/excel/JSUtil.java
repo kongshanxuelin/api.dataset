@@ -1,28 +1,35 @@
 package com.sumslack.excel;
 
 
-import javax.script.*;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import cn.hutool.core.date.DateUtil;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+
+import com.sumslack.js.Db;
+
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.script.ScriptUtil;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 public class JSUtil extends ScriptUtil {
     private static String JAVASCRIPT_TEMPLATE = "JSTool.js";
     private static ClassPathResource resource = new ClassPathResource(JAVASCRIPT_TEMPLATE);
     static FileReader fileReader;
     static ScriptEngine engine = getScript("javascript");
+    static {
+    	engine.put("Db", new Db());
+    }
 
     static {
         try {
@@ -52,7 +59,35 @@ public class JSUtil extends ScriptUtil {
                     engine.put(entry.getKey(), entry.getValue());
                 }
             }
-            return engine.eval(script);
+            Object res = engine.eval(script);
+            return res;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public static List execRetList(String script, Map<String, Object> args) {
+        try {
+            if (script == null || script.equals("")) {
+                return null;
+            }
+            if (args != null || !args.isEmpty()) {
+                for (Map.Entry<String, Object> entry : args.entrySet()) {
+                    engine.put(entry.getKey(), entry.getValue());
+                }
+            }
+            Object obj = engine.eval(script);
+            if(obj instanceof ScriptObjectMirror) {
+	            ScriptObjectMirror res = (ScriptObjectMirror)obj;
+	            if(res.isArray()) {
+	            	Collection<Object> vvs = res.values();
+	            	if(vvs!=null)
+	            		return new ArrayList(vvs);
+	            }
+            }else if(obj instanceof List) {
+            	return (List)obj;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,8 +116,10 @@ public class JSUtil extends ScriptUtil {
 //        Console.log(execute("removeSuffix(removePrefix(c36,'('),')')", bindings));
 //        Console.log(execute("replace(c12,'暂','')", bindings));
 //        Console.log(execute("isDate('2018-1/1')", bindings));
-        Object data = execute("formatDate(new Date(),'yyyy-MM-dd hh:mm:ss')", bindings);
-        Console.log(isDate(null));
+        //Object data = execute("formatDate(new Date(),'yyyy-MM-dd hh:mm:ss')", bindings);
+        //Console.log(isDate(null));
+        
+        Console.log(execRetList("(function(){return [{a:'11',b:'22'},{a:'11a',b:'22a'}];})()",bindings));
 
     }
 

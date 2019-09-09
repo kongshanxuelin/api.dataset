@@ -46,4 +46,14 @@
 	</report>
 	
 	<report id="reportJava" java="com.sumslack.dataset.api.report.impl.ReportTest" />
+  
+  
+  	<report id="testJS" title="测试JS数据集" type="map">
+		<row id="jstest" label="测试测试" lang="js">
+			return Db.use().query("select * from test_city where id>?",1);
+		</row>
+      <row id="jstest222" label="测试测试222" lang="js">
+			return Db.use().query("select * from test_city where id>?",3);
+		</row>
+	</report>
 </reports>

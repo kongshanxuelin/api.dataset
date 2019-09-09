@@ -113,7 +113,8 @@ li {
 				attrs : {
 					label : null,
 					align : [ "left", "center", "right" ],
-					fontWeight : [ "normal", "bold" ]
+					fontWeight : [ "normal", "bold" ],
+					lang:["sql","js"]
 				}
 			}
 		};

@@ -52,7 +52,8 @@ public class ReportUtil {
 						rl.setLabel(StrUtil.formatNullStr(line.getAttribute("label"),"未知"));
 						rl.setAlign(line.getAttribute("align"));
 						rl.setFontWeight(line.getAttribute("fontWeight"));
-						rl.setSql(getCDData(line)); 
+						rl.setLang(StrUtil.formatNullStr(line.getAttribute("lang"),"sql"));
+						rl.setContent(getCDData(line)); 
 						rl.setDs(rp.getDs());
 						lineList.add(rl);
 					}

@@ -2,6 +2,7 @@ package com.sumslack.dataset.api.report.bean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import com.sumscope.tag.sql.TagJDBCInstance;
 import com.sumscope.tag.util.IdWorker;
 import com.sumslack.dataset.api.report.util.ReportUtil;
 import com.sumslack.dataset.api.report.vo.ReportColVO;
+import com.sumslack.excel.JSUtil;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
@@ -20,8 +22,16 @@ public class ReportLineBean implements Serializable{
 	private String align;
 	private String fontWeight;
 	private String id;
-	private String sql;
+	private String content;
 	private String ds;
+	private String lang;
+	
+	public String getLang() {
+		return lang;
+	}
+	public void setLang(String lang) {
+		this.lang = lang;
+	}
 	private List resultList;
 	public String getDs() {
 		return ds;
@@ -47,11 +57,12 @@ public class ReportLineBean implements Serializable{
 	public void setFontWeight(String fontWeight) {
 		this.fontWeight = fontWeight;
 	}
-	public String getSql() {
-		return sql;
+
+	public String getContent() {
+		return content;
 	}
-	public void setSql(String sql) {
-		this.sql = sql;
+	public void setContent(String content) {
+		this.content = content;
 	}
 	public String getId() {
 		if(StrUtil.isEmpty(id)) {
@@ -64,10 +75,17 @@ public class ReportLineBean implements Serializable{
 		this.id = id;
 	}
 	public void init(ReportBean report,Map paramMap) throws Exception{
-		if(this.sql!=null) {
-			List<Map> dataList = TagJDBCInstance.getInstance().queryList(this.ds,
-					ReportUtil.parseParam(this.sql, paramMap),
-					null);
+		if(this.content!=null) {
+			List<Map> dataList = null;
+			if(this.lang.equals("js")) {
+				List res = JSUtil.execRetList("(function(){"+this.content+"})()",paramMap);
+				if(res!=null)
+					dataList = res;
+			}else {
+				dataList = TagJDBCInstance.getInstance().queryList(this.ds,
+						ReportUtil.parseParam(this.content, paramMap),
+						null);
+			}
 			if(report.isJavaAlignData()) {
 				if(report!=null) {
 					List<ReportColVO> cols = report.getCols(paramMap);
