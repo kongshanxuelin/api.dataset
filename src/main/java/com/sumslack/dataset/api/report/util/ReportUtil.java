@@ -53,6 +53,10 @@ public class ReportUtil {
 						rl.setAlign(line.getAttribute("align"));
 						rl.setFontWeight(line.getAttribute("fontWeight"));
 						rl.setLang(StrUtil.formatNullStr(line.getAttribute("lang"),"sql"));
+						
+						rl.setFieldField(StrUtil.formatNullStr(line.getAttribute("field-field"),"field"));
+						rl.setFieldV(StrUtil.formatNullStr(line.getAttribute("field-v"),"v"));
+						
 						rl.setContent(getCDData(line)); 
 						rl.setDs(rp.getDs());
 						lineList.add(rl);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<reports ds="qb">
+<reports ds="default">
 	<report id="avgTemp" title="计算城市平均温2dd度" java-align-data="true" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
 		<row label="测试数据1 " align="right" fontWeight="bold">
 			<![CDATA[
@@ -48,12 +48,12 @@
 	<report id="reportJava" java="com.sumslack.dataset.api.report.impl.ReportTest" />
   
   
-  	<report id="testJS" title="测试JS数据集" type="map">
-		<row id="jstest" label="测试测试" lang="js">
-			return Db.use().query("select * from test_city where id>?",1);
+  	<report id="testJS" title="测试JS数据集" type="map" startDate="2019-08-05" endDate="2019-08-12" step="day" java-align-data="true" dateFormat="yyyy-MM-dd">
+		<row id="jstest" label="测试测试" lang="js" field-field="dt" field-v="num">
+			return Db.use().query("select date_format(dt,'%Y-%m-%d') dt,temp num from test_city_temp where city=?",1);
 		</row>
-      <row id="jstest222" label="测试测试222" lang="js">
-			return Db.use().query("select * from test_city where id>?",3);
+      <row id="jstest222" label="测试测试222" lang="js" field-field="dt" field-v="num">
+			return Db.use().query("select date_format(dt,'%Y-%m-%d') dt,temp num from test_city_temp where city=?",2);
 		</row>
 	</report>
 </reports>

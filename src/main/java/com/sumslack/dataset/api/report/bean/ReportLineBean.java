@@ -16,6 +16,7 @@ import com.sumslack.excel.JSUtil;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.Entity;
 
 public class ReportLineBean implements Serializable{
 	private String label;
@@ -26,6 +27,22 @@ public class ReportLineBean implements Serializable{
 	private String ds;
 	private String lang;
 	
+	//针对日期对应的字段名称，默认值：field，针对数据对应的字段名称
+	private String fieldField = "field";
+	private String fieldV = "v";
+	
+	public String getFieldField() {
+		return fieldField;
+	}
+	public void setFieldField(String fieldField) {
+		this.fieldField = fieldField;
+	}
+	public String getFieldV() {
+		return fieldV;
+	}
+	public void setFieldV(String fieldV) {
+		this.fieldV = fieldV;
+	}
 	public String getLang() {
 		return lang;
 	}
@@ -94,9 +111,15 @@ public class ReportLineBean implements Serializable{
 						Map m = new HashMap();
 						m.put("field", col.getField());
 						Optional<Map> vv = dataList.stream().filter(s -> {
-							return Convert.toStr(s.get("field")).equals(col.getField());
+							if(s instanceof Entity) {
+								if(((Entity) s).getStr(this.fieldField)!=null)
+									return ((Entity) s).getStr(this.fieldField).equals(col.getField());
+							}else {
+								return Convert.toStr(s.get(this.fieldField)).equals(col.getField());
+							}
+							return true;
 						}).findFirst();
-						m.put("v", vv.isPresent()?vv.get().get("v"):null);
+						m.put("v", vv.isPresent()?vv.get().get(this.fieldV):null);
 						this.resultList.add(m);
 					}
 				}
