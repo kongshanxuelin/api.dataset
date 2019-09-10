@@ -3,7 +3,7 @@
 	<report id="avgTemp" title="计算城市平均温2dd度" java-align-data="true" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
 		<row label="测试数据1 " align="right" fontWeight="bold">
 			<![CDATA[
-				{call testRetSelect('${date}')}
+				{call testRetSelect('${date}','2019-09-01')}
 			]]>
 		</row>
 		<row label="测试数据2" align="right" fontWeight="bold">
@@ -55,5 +55,42 @@
       <row id="jstest222" label="测试测试222" lang="js" field-field="dt" field-v="num">
 			return Db.use().query("select date_format(dt,'%Y-%m-%d') dt,temp num from test_city_temp where city=?",2);
 		</row>
+	</report>
+  
+  	<report id="qblive" ds="qb" title="测试的" java-align-data="true" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
+		<row label="存储过程 ">
+			<![CDATA[
+				{call testRetSelect('${date}')}
+			]]>
+		</row>
+		<row label="SQL语句">
+			<![CDATA[			
+				select distinct DATE_FORMAT(ga.create_time,'%Y%m') field,
+          (select count(*) from idb_financial_company where 
+          STATUS=1 and DATE_FORMAT(create_time,'%Y-%m')<=DATE_FORMAT(ga.create_time,'%Y%m')) v
+          from idb_financial_company ga where ga.status=1
+          and DATE_FORMAT(ga.create_time,'%Y%m')>='201901'
+          order by DATE_FORMAT(ga.create_time,'%Y%m')
+			]]>
+		</row>
+      <row label="JS" lang="js">
+			<![CDATA[			
+				return Db.use("qb").query("select DATE_FORMAT(dt,'%Y%m') field,sum(day5_alive) v "+
+                          "from day_alive where account_id='72dd2fd8b7464ae6a3b85d1c897322f2' "+
+                          "and dt>='2019-02-01' group by DATE_FORMAT(dt,'%Y%m')");
+			]]>
+		</row>
+	</report>
+  
+  <report id="testlines" ds="qb" title="一个row中返回多个结果" startDate="2019-01-01" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
+      <row field-field="dt" field-v="v" field-label="bank_nature_name_en">
+        <![CDATA[			
+				  select bank_nature_name_en,DATE_FORMAT(create_time,'%Y%m') dt,count(*) v
+            from idb_financial_company 
+            where create_time>='2019-01-01' and bank_nature_name_en is not null
+            group by bank_nature_name_en,DATE_FORMAT(create_time,'%Y%m')
+            order by bank_nature_name_en,DATE_FORMAT(create_time,'%Y%m')
+			]]>
+      </row>
 	</report>
 </reports>

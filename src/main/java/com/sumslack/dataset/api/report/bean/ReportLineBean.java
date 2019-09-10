@@ -2,11 +2,11 @@ package com.sumslack.dataset.api.report.bean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.sumscope.tag.sql.TagJDBCInstance;
 import com.sumscope.tag.util.IdWorker;
@@ -28,9 +28,16 @@ public class ReportLineBean implements Serializable{
 	private String lang;
 	
 	//针对日期对应的字段名称，默认值：field，针对数据对应的字段名称
-	private String fieldField = "field";
-	private String fieldV = "v";
+	private String fieldField = "field";  //曲线x坐标
+	private String fieldV = "v";		//曲线Y坐标
+	private String fieldLabel = "label"; //曲线名称
 	
+	public String getFieldLabel() {
+		return fieldLabel;
+	}
+	public void setFieldLabel(String fieldLabel) {
+		this.fieldLabel = fieldLabel;
+	}
 	public String getFieldField() {
 		return fieldField;
 	}
@@ -99,11 +106,14 @@ public class ReportLineBean implements Serializable{
 				if(res!=null)
 					dataList = res;
 			}else {
+				/**
+				 * SQL执行后的数据集可能有label，field和数据三个字段，需要转换成：{label:{title:"",id:""},data:[{field:"",v:""}]}的形式用于前端展现
+				 */
 				dataList = TagJDBCInstance.getInstance().queryList(this.ds,
 						ReportUtil.parseParam(this.content, paramMap),
 						null);
 			}
-			if(report.isJavaAlignData()) {
+			if(report.isJavaAlignData() && !StrUtil.isBlankIfStr(this.fieldLabel)) {
 				if(report!=null) {
 					List<ReportColVO> cols = report.getCols(paramMap);
 					this.resultList = new ArrayList();

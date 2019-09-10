@@ -6,15 +6,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.sumslack.dataset.api.report.util.ReportUtil;
 import com.sumslack.dataset.api.report.vo.ReportColVO;
 import com.sumslack.dataset.api.report.vo.ReportLineLabelVO;
 import com.sumslack.dataset.api.report.vo.ReportLineVO;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.Entity;
 
 public class ReportBean implements Serializable{
 	private String id;
@@ -194,14 +198,51 @@ public class ReportBean implements Serializable{
 		return cols;
 	}
 	
-	public List<ReportLineVO> returnReportJSON(Map paramMap) {
+	public List<ReportLineVO> returnReportJSON(Map paramMap) throws Exception{
 		List<ReportLineVO> rows = new ArrayList();
 		for(ReportLineBean line : this.lines) {
-			ReportLineVO lineVO = new ReportLineVO();
-			ReportLineLabelVO label = new ReportLineLabelVO(line.getId(),line.getLabel(),line.getAlign(),line.getFontWeight());
-			lineVO.setLabel(label);
-			lineVO.setData(line.getResultList());
-			rows.add(lineVO);
+			if(StrUtil.isBlankIfStr(line.getFieldLabel())) {
+				ReportLineVO lineVO = new ReportLineVO();
+				ReportLineLabelVO label = new ReportLineLabelVO(line.getId(),line.getLabel(),line.getAlign(),line.getFontWeight());
+				lineVO.setLabel(label);
+				lineVO.setData(line.getResultList());
+				rows.add(lineVO);
+			}else { //如果一条曲线，在SQL中被定义了label属性，说明该SQL或存储过程返回的是多条曲线
+				//对返回的数据集再处理,这时候返回的是原始数据集，select label,field,v的形式
+				List<Map> dataList = line.getResultList();
+				List<String> _lables = new ArrayList();
+				dataList.stream().map(s -> Convert.toStr(s.get(line.getFieldLabel()))).filter(s -> !StrUtil.isEmpty(s)).distinct()
+				.forEach(s -> {
+					_lables.add(s);
+				});
+				
+				for(String _label : _lables) {
+					ReportLineVO lineVO = new ReportLineVO();
+					ReportLineLabelVO label = new ReportLineLabelVO(line.getId(),_label,line.getAlign(),line.getFontWeight());
+					lineVO.setLabel(label);
+					
+					List<Map> _thisLabeDatalList = dataList.stream().filter(s -> Convert.toStr(s.get(line.getFieldLabel())).equals(_label))
+							.collect(Collectors.toList());
+					List<Map> thisDataList = new ArrayList();
+					for(ReportColVO col : this.getCols(paramMap)) {
+						Map m = new HashMap();
+						m.put("field", col.getField());
+						Optional<Map> vv = _thisLabeDatalList.stream().filter(s -> {
+							if(s instanceof Entity) {
+								if(((Entity) s).getStr(line.getFieldField())!=null)
+									return ((Entity) s).getStr(line.getFieldField()).equals(col.getField());
+							}else {
+								return Convert.toStr(s.get(line.getFieldField())).equals(col.getField());
+							}
+							return true;
+						}).findFirst();
+						m.put("v", vv.isPresent()?vv.get().get(line.getFieldV()):null);
+						thisDataList.add(m);
+					}
+					lineVO.setData(thisDataList);
+					rows.add(lineVO);
+				}
+			}
 		}
 		return rows;
 	}

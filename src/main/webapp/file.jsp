@@ -118,7 +118,10 @@ li {
 					label : null,
 					align : [ "left", "center", "right" ],
 					fontWeight : [ "normal", "bold" ],
-					lang:["sql","js"]
+					lang:["sql","js"],
+					"field-field":null,
+					"field-v":"",
+					"field-label":null
 				}
 			}
 		};

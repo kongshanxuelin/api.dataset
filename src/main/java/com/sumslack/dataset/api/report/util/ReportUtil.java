@@ -56,6 +56,7 @@ public class ReportUtil {
 						
 						rl.setFieldField(StrUtil.formatNullStr(line.getAttribute("field-field"),"field"));
 						rl.setFieldV(StrUtil.formatNullStr(line.getAttribute("field-v"),"v"));
+						rl.setFieldLabel(StrUtil.formatNullStr(line.getAttribute("field-label"),"label"));
 						
 						rl.setContent(getCDData(line)); 
 						rl.setDs(rp.getDs());
