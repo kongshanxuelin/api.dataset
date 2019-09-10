@@ -22,5 +22,4 @@ public class FieldMapping {
 	public void setUpdate(Boolean update) {
 		this.update = update;
 	}
-    
 }

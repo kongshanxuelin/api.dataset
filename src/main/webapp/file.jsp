@@ -20,6 +20,9 @@
 <script src="<sn:webroot/>/js/addon/selection/active-line.js"></script>
 <script src="<sn:webroot/>/js/addon/edit/matchtags.js"></script>
 
+<!-- upload file -->
+<script src="<sn:webroot/>/js/jquery.ocupload-1.1.2.js"></script>
+
 <style type="text/css">
 .CodeMirror {
 	border: 1px solid #eee;
@@ -49,7 +52,7 @@ li {
 	color: #155724;
 	margin-left:10px;
 }
-#btnSave {
+#btnSave,#btnImpExcel {
     display: inline-block;
     font-weight: 400;
     color: #212529;
@@ -73,6 +76,7 @@ li {
 				<td align="right" style="padding-right:10px;">
 					<span id="tip"></span>
 					<input style="margin-left:10px;" type="button" id="btnSave" value="保存 Ctrl+S" />
+					<input type="button" id="btnImpExcel" value="导入Excel" />
 				</td>
 			</tr>
 		</table>
@@ -205,6 +209,32 @@ li {
 			$("#btnSave").bind("click",function(){
 				saveFile();
 			});
+			$("#btnImpExcel").upload({
+                name: 'file',
+                action: '<sn:webroot/>/excel/upload',
+                enctype: 'multipart/form-data',
+                params: {},
+                autoSubmit: true,
+                onSubmit: function() {},
+                onComplete: function(data) {
+                	console.log("onComplete:",data);
+                	data = JSON.parse(data);
+                	if(data.code === 0){
+                		alert("导入成功！");
+                	}else{
+                		alert("导入失败:"+data.error);
+                	}
+                },
+                onSelect: function() {
+                	this.autoSubmit=false;
+                	var regex =/^.*\.(?:xls|xlsx)$/i;
+                	if(regex.test($("[name = '"+this.name()+"']").val())){
+                        this.submit();
+                    }else{
+                        alert("请选择一个Excel文件！");
+                    }
+                }
+        	});
 		});
 	</script>
 </body>

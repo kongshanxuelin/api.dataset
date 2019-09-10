@@ -4,24 +4,26 @@ import java.util.List;
 
 public class SheetDefine {
 	 private String sheetName;
-     private String dbType;
+     private String datasource;
      private String tableName;
      private int beginRow;
      private String primaryKey;
      private String filter;
      private Boolean insert;
-     private List<FieldMapping> fields;
+     
+	private List<FieldMapping> fields;
 	public String getSheetName() {
 		return sheetName;
 	}
 	public void setSheetName(String sheetName) {
 		this.sheetName = sheetName;
 	}
-	public String getDbType() {
-		return dbType;
+
+	public String getDatasource() {
+		return datasource;
 	}
-	public void setDbType(String dbType) {
-		this.dbType = dbType;
+	public void setDatasource(String datasource) {
+		this.datasource = datasource;
 	}
 	public String getTableName() {
 		return tableName;

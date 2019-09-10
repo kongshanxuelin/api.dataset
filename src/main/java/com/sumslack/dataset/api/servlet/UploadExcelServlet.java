@@ -16,6 +16,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.sumscope.tag.rest.TagRest;
@@ -58,11 +59,15 @@ public class UploadExcelServlet extends AjaxServlet{
 				}
 			}
 		}
-		
-		for (FileItem _file : files) {
-			InputStream in = _file.getInputStream();
-			ImportExcelUtil ex = new ImportExcelUtil();
-			R r = ex.importExcel(in);
+		try {
+			for (FileItem _file : files) {
+				ImportExcelUtil ex = new ImportExcelUtil();
+				R r = ex.importExcel(_file);
+				printOut(response, request, JSON.toJSONString(r));
+			}
+		}catch(Exception ex) {
+			R r = new R();
+			r.error(ex.getMessage());
 			printOut(response, request, JSON.toJSONString(r));
 		}
 	}

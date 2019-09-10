@@ -1,12 +1,13 @@
 package com.sumslack.excel;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.fileupload.FileItem;
 
 import com.sumscope.tag.TagConst;
 import com.sumscope.tag.sql.bean.AbsDataSource;
@@ -15,7 +16,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.NumberUtil;
@@ -35,7 +35,7 @@ import cn.hutool.poi.excel.ExcelUtil;
 public class ImportExcelUtil {
 	private static Log log = LogFactory.get();
 
-	public R importExcel(InputStream filedDta) {
+	public R importExcel(FileItem filedDta) {
 		try {
 			// 获取模板定义
 			List<SheetDefine> sheetDefineList = getExcelDefine(filedDta);
@@ -51,7 +51,7 @@ public class ImportExcelUtil {
 		}
 	}
 
-	private R saveExcelBySheetDefine(List<SheetDefine> sheetDefineList, InputStream fileData) {
+	private R saveExcelBySheetDefine(List<SheetDefine> sheetDefineList, FileItem fileData) {
 		for (SheetDefine sheetDefine : sheetDefineList) {
 			// 解析sheet，并且入库
 			R error = handleSheet(sheetDefine, fileData);
@@ -63,10 +63,10 @@ public class ImportExcelUtil {
 	}
 
 	 private AbsDataSource getDruidDataSource(SheetDefine sheetDefine) {
-		 return TagConst.dataSourceMap.get(sheetDefine.getDbType());
+		 return TagConst.dataSourceMap.get(sheetDefine.getDatasource());
 	    }
 	 
-	private R handleSheet(SheetDefine sheetDefine, InputStream fileData) {
+	private R handleSheet(SheetDefine sheetDefine, FileItem fileData) {
 		AbsDataSource ds = null;
 		try {
 			ds = getDruidDataSource(sheetDefine);
@@ -83,36 +83,49 @@ public class ImportExcelUtil {
 		}
 
 	}
-
+	private boolean isSheet(List<SheetDefine> defines,String sheetName) {
+		return defines.stream().filter(s -> s.getSheetName().equals(sheetName)).findAny().isPresent();
+	}
 	/**
 	 * 获取模板定义信息
 	 *
 	 * @param inputStream
 	 * @return
 	 */
-	public List<SheetDefine> getExcelDefine(InputStream inputStream) {
-		ExcelReader reader = ExcelUtil.getReader(inputStream, "模板定义");
+	public List<SheetDefine> getExcelDefine(FileItem inputStream) throws IOException {
+		ExcelReader reader = ExcelUtil.getReader(inputStream.getInputStream(), "模板定义");
 
 		List<List<Object>> defineList = reader.read();
 
 		List<SheetDefine> retList = new ArrayList<>();
 		SheetDefine sheetDefine = new SheetDefine();
+		String _cSheetName = "";
 		for (List<Object> row : defineList) {
-			if (ObjectUtil.isNotNull(row.get(0))) {
+			String sheetWhich = Convert.toStr(row.get(0),"");
+			if(!StrUtil.isEmpty(sheetWhich)) {
+				_cSheetName = sheetWhich;
+			}
+			if(_cSheetName.startsWith("###")) { //代表该sheet导入到Excel注释掉
+				continue;
+			}
+			if (!StrUtil.isEmpty(sheetWhich)) {
 				sheetDefine = new SheetDefine();
 				sheetDefine.setSheetName(Convert.toStr(row.get(0)));
 				List<FieldMapping> fields = new ArrayList<>();
 				sheetDefine.setFields(fields);
-
 				retList.add(sheetDefine);
 			} else {
+				//忽略注释掉的sheet定义
+				if(!isSheet(retList,_cSheetName)) {
+					continue;
+				}
 				if (row.size() == 3) {
 					// 属性设置
 					String col = Convert.toStr(row.get(1));
 					String col2 = Convert.toStr(row.get(2));
 					if (!col.equalsIgnoreCase("fields")) {
-						if (col.equalsIgnoreCase("dbType")) {
-							sheetDefine.setDbType(col2);
+						if (col.equalsIgnoreCase("ds")) {
+							sheetDefine.setDatasource(col2);
 						} else if (col.equalsIgnoreCase("tableName")) {
 							sheetDefine.setTableName(col2);
 						} else if (col.equalsIgnoreCase("beginRow")) {
@@ -128,6 +141,9 @@ public class ImportExcelUtil {
 						// ignore
 					}
 				} else if (row.size() >= 4) {
+					if(StrUtil.isEmpty(Convert.toStr(row.get(2)))) {
+						continue;
+					}
 					// 设置列映射
 					List<FieldMapping> fields = sheetDefine.getFields();
 					FieldMapping field = new FieldMapping();
@@ -147,43 +163,52 @@ public class ImportExcelUtil {
 	}
 
 	private void alterTable(SheetDefine sheetDefine, AbsDataSource ds) throws SQLException {
+		//如果表不存在则先创建表
         //查询表结构
         List<Entity> columnList = DbUtil.use(ds.getDataSource()).query("select column_name, column_comment,column_type from information_schema.columns where  table_name = '" + sheetDefine.getTableName() + "'");
         if (CollUtil.isEmpty(columnList)) {
-            throw new RuntimeException("表【" + sheetDefine.getTableName() + "】不存在！");
-        }
-
-        //比对excel模板字段和表字段是否一致
-        List<FieldMapping> fieldMappingList = sheetDefine.getFields();
-        List<String> needAddList = new ArrayList<>();
-        for (FieldMapping field : fieldMappingList) {
-            boolean needAdd = true;
-            for (Entity entity : columnList) {
-                String colName = entity.getStr("column_name");
-                if (field.getTableField().equalsIgnoreCase(colName)) {
-                    needAdd = false;
-                    continue;
-                }
-            }
-            if (needAdd) {
-                needAddList.add("alter table " + sheetDefine.getTableName() + " add  " + field.getTableField() + " varchar(255)");
-            }
-        }
-        //同步表结构
-        for (String sql : needAddList) {
-            log.info("alter table SQL --> {}", sql);
-            DbUtil.use(ds.getDataSource()).execute(sql);
+            //throw new RuntimeException("表【" + sheetDefine.getTableName() + "】不存在！");
+        	String createTable = "CREATE TABLE `"+sheetDefine.getTableName()+"` (\r\n";
+        	List<FieldMapping> fieldMappingList = sheetDefine.getFields();
+        	for (FieldMapping field : fieldMappingList) {
+                createTable += "`"+field.getTableField()+"` varchar(255),\r\n";
+        	}
+        	createTable += "PRIMARY KEY ("+sheetDefine.getPrimaryKey()+")\r\n ";
+        	createTable += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+        	DbUtil.use(ds.getDataSource()).execute(createTable);
+        }else {
+	        //比对excel模板字段和表字段是否一致
+	        List<FieldMapping> fieldMappingList = sheetDefine.getFields();
+	        List<String> needAddList = new ArrayList<>();
+	        for (FieldMapping field : fieldMappingList) {
+	            boolean needAdd = true;
+	            for (Entity entity : columnList) {
+	                String colName = entity.getStr("column_name");
+	                if (field.getTableField().equalsIgnoreCase(colName)) {
+	                    needAdd = false;
+	                    continue;
+	                }
+	            }
+	            if (needAdd) {
+	                needAddList.add("alter table " + sheetDefine.getTableName() + " add  " + field.getTableField() + " varchar(255)");
+	            }
+	        }
+	        //同步表结构
+	        for (String sql : needAddList) {
+	            log.info("alter table SQL --> {}", sql);
+	            DbUtil.use(ds.getDataSource()).execute(sql);
+	        }
         }
     }
 
-	private void saveExcel(SheetDefine sheetDefine, InputStream fileData, AbsDataSource ds) throws IOException, SQLException {
+	private void saveExcel(SheetDefine sheetDefine, FileItem fileData, AbsDataSource ds) throws IOException, SQLException {
         //获取模板中定义的sheet
         String sheetName = sheetDefine.getSheetName();
         ExcelReader reader;
         if (NumberUtil.isNumber(sheetName)) {
-            reader = ExcelUtil.getReader(fileData, Convert.toInt(sheetName));
+            reader = ExcelUtil.getReader(fileData.getInputStream(), Convert.toInt(sheetName));
         } else {
-            reader = ExcelUtil.getReader(fileData, sheetName);
+            reader = ExcelUtil.getReader(fileData.getInputStream(), sheetName);
         }
         //解析
         List<List<Object>> reader2 = reader.read();
@@ -209,7 +234,7 @@ public class ImportExcelUtil {
                 Object[] objs = getUpdateParam(sheetDefine, row);
                 updateParamsList.add(objs);
                 Console.log(JSONUtil.toJsonStr(objs));
-            } else if (sheetDefine.getInsert()) {
+            } else {
                 sqlMap.put("insertSql", getInsertSql(sheetDefine));
                 insertParamsList.add(getInsertParam(sheetDefine, row));
             }
@@ -369,7 +394,7 @@ public class ImportExcelUtil {
             if (primaryKeyArray != null && primaryKeyArray.length > 0) {
                 for (String str : primaryKeyArray) {
                     for (FieldMapping fm : sheetDefine.getFields()) {
-                        if (fm.getTableField().equalsIgnoreCase(str)) {
+                        if (!StrUtil.isBlankIfStr(fm.getTableField()) && fm.getTableField().equalsIgnoreCase(str)) {
                             sql.append(" and " + str + "='" + row.get(Convert.toInt(fm.getRuleField().replace("c", "")) - 1) + "'");
                         }
                     }
