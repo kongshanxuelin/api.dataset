@@ -50,6 +50,8 @@ public class Db {
 		}
 		return null;
 	}
+	
+	/** 为了安全性，我们强烈不建议你开启数据库的增删改操作对外
 	public int execute(String sql,Object... params) {
 		try {
 			return DbUtil.use(this.ds).execute(sql, params);
@@ -93,7 +95,7 @@ public class Db {
 			return -1;
 		}
 	}
-	
+	**/
 	private Entity entityIt(String tableName,Object where) {
 		Entity whereEntity = null;
 		if(tableName!=null) {
@@ -111,4 +113,5 @@ public class Db {
 	private Entity entityIt(Object where) {
 		return entityIt(null,where);
 	}
+	
 }

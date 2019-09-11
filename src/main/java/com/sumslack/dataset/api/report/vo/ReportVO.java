@@ -8,6 +8,8 @@ public class ReportVO {
 	
 	private RET ret;
 	private String errMsg;
+	private String title;//报表标题
+	private String subtitle;//报表父标题
 	private List<ReportColVO> cols;
 	private List<ReportLineVO> rows;
 	//当指定了type时，返回的是这个对象
@@ -51,6 +53,22 @@ public class ReportVO {
 
 	public void setResult(Object result) {
 		this.result = result;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getSubtitle() {
+		return subtitle;
+	}
+
+	public void setSubtitle(String subtitle) {
+		this.subtitle = subtitle;
 	}
 	
 	

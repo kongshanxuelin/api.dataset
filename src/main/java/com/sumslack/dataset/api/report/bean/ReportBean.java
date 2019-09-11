@@ -23,6 +23,8 @@ import cn.hutool.db.Entity;
 public class ReportBean implements Serializable{
 	private String id;
 	private String title;
+	private String subtitle;
+	private boolean cache = false;//是否缓存记录集
 	private String ds; //数据源
 	private String startDate;
 	private String endDate;
@@ -114,6 +116,18 @@ public class ReportBean implements Serializable{
 		}
 	}
 	
+	public String getSubtitle() {
+		return subtitle;
+	}
+	public void setSubtitle(String subtitle) {
+		this.subtitle = subtitle;
+	}
+	public boolean isCache() {
+		return cache;
+	}
+	public void setCache(boolean cache) {
+		this.cache = cache;
+	}
 	/**
 	 * 根据传入的开始日期和结束日期，计算动态列
 	 * @param paramMap

@@ -52,7 +52,7 @@ li {
 	color: #155724;
 	margin-left:10px;
 }
-#btnSave,#btnImpExcel {
+input[type=button] {
     display: inline-block;
     font-weight: 400;
     color: #212529;
@@ -65,6 +65,17 @@ li {
     border-radius: .25rem;
         user-select: none;
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.footer {
+	text-align:right;
+	padding-right:4px 15px 4px 0px;
+	height:20px;
+	line-height:20px;
+	font-size:12px;
+}
+.footer input[type=button] {
+	font-size: 12px;
+    line-height: 20px;
 }
 </style>
 </head>
@@ -88,6 +99,9 @@ li {
 					</a> 访问对应接口，xxx是report节点id的值
 	</div>
 	<textarea id="code" name="code">${c}</textarea>
+	<div class="footer">
+		<input style="margin-left:10px;" type="button" id="btnCache" value="清空缓存" />		
+	</div>
 	<script type="text/javascript">
 		var dss = "${ds}".split(",");
 		var tags = {
@@ -102,6 +116,8 @@ li {
 				attrs : {
 					id : null,
 					title : null,
+					subtitle:null,
+					cache:["false","true"],
 					ds : dss,
 					startDate : null,
 					endDate : null,
@@ -206,11 +222,27 @@ li {
 				schemaInfo : tags
 			}
 		});
-		editor.setSize('100%', (document.body.clientHeight-120) + 'px');
+		editor.setSize('100%', (document.body.clientHeight-145) + 'px');
 		
 		$(function(){
 			$("#btnSave").bind("click",function(){
 				saveFile();
+			});
+			$("#btnCache").bind("click",function(){
+				$.ajax({
+					type:"get",
+					url:"<sn:webroot/>/report/clearcache",
+					success:function(json){
+						if(json.code === 0){
+							alert("已清空缓存！");
+						}else{
+							alert("操作失败！");
+						}
+					},
+					error:function(){
+						
+					}
+				});
 			});
 			$("#btnImpExcel").upload({
                 name: 'file',

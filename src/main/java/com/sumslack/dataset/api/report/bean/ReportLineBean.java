@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.sumscope.tag.sql.TagJDBCInstance;
 import com.sumscope.tag.util.IdWorker;
@@ -14,6 +13,9 @@ import com.sumslack.dataset.api.report.util.ReportUtil;
 import com.sumslack.dataset.api.report.vo.ReportColVO;
 import com.sumslack.excel.JSUtil;
 
+import cn.hutool.cache.Cache;
+import cn.hutool.cache.CacheUtil;
+import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
@@ -106,6 +108,13 @@ public class ReportLineBean implements Serializable{
 	public void setId(String id) {
 		this.id = id;
 	}
+	
+	public static Cache<String, List> resultCache = CacheUtil.newLFUCache(3000);
+	
+	private String getCacheKey(ReportBean report,String key) {
+		return Convert.toStr(report.getId()) + "-" + key.hashCode();
+	}
+	
 	public void init(ReportBean report,Map paramMap) throws Exception{
 		if(this.content!=null) {
 			List<Map> dataList = null;
@@ -121,11 +130,24 @@ public class ReportLineBean implements Serializable{
 				/**
 				 * SQL执行后的数据集可能有label，field和数据三个字段，需要转换成：{label:{title:"",id:""},data:[{field:"",v:""}]}的形式用于前端展现
 				 */
-				dataList = TagJDBCInstance.getInstance().queryList(this.ds,
-						ReportUtil.parseParam(this.content, paramMap),
-						null);
+				String _content = ReportUtil.parseParam(this.content, paramMap);
+				if(report.isCache()) {
+					String _cacheKey = getCacheKey(report,_content);
+					if(resultCache.containsKey(_cacheKey)) {
+						dataList = resultCache.get(_cacheKey);
+					}else {
+						dataList = TagJDBCInstance.getInstance().queryList(this.ds,
+								_content,
+								null);
+						resultCache.put(_cacheKey, dataList,3600*1000);
+					}
+				}else {
+					dataList = TagJDBCInstance.getInstance().queryList(this.ds,
+							_content,
+							null);
+				}
 			}
-			if(report.isJavaAlignData() && !StrUtil.isBlankIfStr(this.fieldLabel)) {
+			if(report.isJavaAlignData() && StrUtil.isBlankIfStr(this.fieldLabel)) {
 				if(report!=null) {
 					List<ReportColVO> cols = report.getCols(paramMap);
 					this.resultList = new ArrayList();

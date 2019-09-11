@@ -2,19 +2,21 @@ package com.sumslack.dataset.api.report.util;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.CharacterData;
 
 import com.sumscope.tag.util.StrUtil;
 import com.sumslack.dataset.api.report.bean.ReportBean;
 import com.sumslack.dataset.api.report.bean.ReportLineBean;
 import com.sumslack.dataset.api.report.job.ReportJob;
+import com.sumslack.freemarker.functions.DateAdd;
 
 import cn.hutool.core.util.XmlUtil;
 import freemarker.template.Configuration;
@@ -32,9 +34,13 @@ public class ReportUtil {
 		List<Element> reports = XmlUtil.getElements(rootElement, "report");
 		if(reports!=null) {
 			for(Element report : reports) {
+				String _title = StrUtil.formatNullStr(report.getAttribute("title"));
+				if(_title.startsWith("//")) continue;
 				ReportBean rp = new ReportBean();
 				rp.setId(StrUtil.formatNullStr(report.getAttribute("id")));
-				rp.setTitle(StrUtil.formatNullStr(report.getAttribute("title")));
+				rp.setTitle(_title);
+				rp.setSubtitle(report.getAttribute("subtitle"));
+				rp.setCache(StrUtil.formatNullStr(report.getAttribute("cache"),"false").equals("true"));
 				rp.setDs(report.hasAttribute("ds")?StrUtil.formatNullStr(report.getAttribute("ds")):dsDefault);
 				rp.setStartDate(StrUtil.formatNullStr(report.getAttribute("startDate")));
 				rp.setEndDate(StrUtil.formatNullStr(report.getAttribute("endDate")));
@@ -73,10 +79,15 @@ public class ReportUtil {
 	
 	public static String parseParam(String str,Map paramMap) throws Exception{
 		Configuration cfg = new Configuration();    
-        cfg.setTemplateLoader(new StringTemplateLoader(str));    
+        cfg.setTemplateLoader(new StringTemplateLoader(str));
         cfg.setDefaultEncoding("UTF-8");
         Template template = cfg.getTemplate("");
         StringWriter writer = new StringWriter();    
+        if(paramMap == null) {
+        	paramMap = new HashMap();
+        }
+        paramMap.put("dateAdd", new DateAdd());
+        
         template.process(paramMap, writer);  
         return writer.toString();
 	}
@@ -103,5 +114,13 @@ public class ReportUtil {
 	        }
 	    }
 	    return "";
+	}
+	
+	
+	public static void main(String[] args) throws Exception {
+		String str = "hello,${test},${dateAdd('2019-09-08',-1,'month')?string('yyyy-MM-dd')}";
+		Map paramMap = new HashMap();
+		paramMap.put("test", 12);
+		System.out.println(ReportUtil.parseParam(str,paramMap));
 	}
 }

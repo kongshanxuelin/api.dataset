@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <reports ds="default">
-	<report id="avgTemp" title="计算城市平均温2dd度" java-align-data="true" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
-		<row label="测试数据1 " align="right" fontWeight="bold">
+	<report id="avgTemp" title="//计算城市平均温2dd度" java-align-data="true" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
+		<row label="//测试数据1 " align="right" fontWeight="bold">
 			<![CDATA[
 				{call testRetSelect('${date}','2019-09-01')}
 			]]>
 		</row>
-		<row label="测试数据2" align="right" fontWeight="bold">
+		<row label="//测试数据2" align="right" fontWeight="bold">
 			<![CDATA[			
 				select city field,avg(temp) v 
 				from test_city_temp
@@ -15,14 +15,14 @@
 			]]>
 		</row>
 	</report>
-	<report id="testWeek" title="测试动态列周"  startDate="2019-08-27" endDate="2019-09-01" step="day" dateFormat="yyyyMMdd">
+	<report id="testWeek" title="//测试动态列周"  startDate="2019-08-27" endDate="2019-09-01" step="day" dateFormat="yyyyMMdd">
 		<row label="test " align="right" fontWeight="bold">
 			<![CDATA[
 				{call testRetSelect('${date}')}
 			]]>
 		</row>
 	</report>
-	<report id="testJavaAlignData" title="测试后台对齐数据" java-align-data="true" ds="default" startDate="2019-08-07" endDate="2019-08-09" step="day" dateFormat="yyyyMMdd">
+	<report id="testJavaAlignData" title="//测试后台对齐数据" java-align-data="true" ds="default" startDate="2019-08-07" endDate="2019-08-09" step="day" dateFormat="yyyyMMdd">
 		<row label="d1">
 			<![CDATA[
 				select DATE_FORMAT(dt,'%Y%m%d') field,temp v from test_city_temp where city = 1
@@ -36,7 +36,7 @@
 	</report>
 	
 				
-	<report id="TestIndex" title="测试返回类型map" type="map">
+	<report id="TestIndex" title="//测试返回类型map" type="map">
 		<row id="aaa" label="指标1">
 			select count(*) num from test_city
 		</row>
@@ -45,10 +45,10 @@
 		</row>
 	</report>
 	
-	<report id="reportJava" java="com.sumslack.dataset.api.report.impl.ReportTest" />
+	<report id="reportJava" title="//" java="com.sumslack.dataset.api.report.impl.ReportTest" />
   
   
-  	<report id="testJS" title="测试JS数据集" type="map" startDate="2019-08-05" endDate="2019-08-12" step="day" java-align-data="true" dateFormat="yyyy-MM-dd">
+  	<report id="testJS" title="//测试JS数据集" type="map" startDate="2019-08-05" endDate="2019-08-12" step="day" java-align-data="true" dateFormat="yyyy-MM-dd">
 		<row id="jstest" label="测试测试" lang="js" field-field="dt" field-v="num">
 			return Db.use().query("select date_format(dt,'%Y-%m-%d') dt,temp num from test_city_temp where city=?",1);
 		</row>
@@ -58,13 +58,13 @@
 	</report>
   
     
-  	<report id="testJS2" type="int">
+  	<report id="testJS2" title="//" type="int">
 		<row id="abc" label="测试测试" lang="js">
 			return Db.use().del("t_test",{id:1});
 		</row>
 	</report>
   
-  	<report id="qblive" ds="qb" title="测试的" java-align-data="true" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
+  	<report id="qblive" ds="qb" title="//测试的" java-align-data="true" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
 		<row label="存储过程 ">
 			<![CDATA[
 				{call testRetSelect('${date}')}
@@ -89,7 +89,7 @@
 		</row>
 	</report>
   
-  <report id="testlines" ds="qb" title="一个row中返回多个结果" startDate="2019-01-01" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
+  <report id="testlines" ds="qb" title="//一个row中返回多个结果" startDate="2019-01-01" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
       <row field-field="dt" field-v="v" field-label="bank_nature_name_en">
         <![CDATA[			
 				  select bank_nature_name_en,DATE_FORMAT(create_time,'%Y%m') dt,count(*) v
@@ -101,10 +101,18 @@
       </row>
 	</report>
   
-    <report id="001_sp_GetValidCompanys" ds="qb" title="按月统计有效机构总数" java-align-data="true" startDate="2019-01-01" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
+    <report id="001_sp_GetValidCompanys"  ds="qb" title="//按月统计有效机构总数" java-align-data="true" startDate="2019-01-01" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
     <row field-field="dt" field-v="num" label="存储过程 ">
 			<![CDATA[
 				{call 001_sp_GetValidCompanys('${date}')}
+			]]>
+		</row>
+	</report>
+  
+    <report ds="qb" id="001_sp_EntitiesAnalysisByBranch" cache="true" title="按机构进行统计分析" startDate="2019-01-01" endDate="${dateAdd(toDate,-1,'month')?string('yyyy-MM-dd')}" step="month" dateFormat="yyyyMM">
+    <row field-field="dt" field-v="num" field-label="name" label="存储过程 ">
+			<![CDATA[
+				{call 001_sp_EntitiesAnalysisByBranch('${fromDate}','${toDate}')}
 			]]>
 		</row>
 	</report>

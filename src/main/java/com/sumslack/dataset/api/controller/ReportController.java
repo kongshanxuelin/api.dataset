@@ -10,8 +10,10 @@ import com.sumscope.tag.TagConst;
 import com.sumscope.tag.rest.annotation.Post;
 import com.sumscope.tag.rest.annotation.URIAlias;
 import com.sumscope.tag.rest.servlet.BaseController;
+import com.sumslack.dataset.api.report.bean.ReportLineBean;
 import com.sumslack.dataset.api.report.job.ReportJob;
 import com.sumslack.dataset.api.report.util.ReportUtil;
+import com.sumslack.excel.R;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
@@ -28,6 +30,13 @@ public class ReportController extends BaseController{
 		return "/file.jsp";
 	}
 	
+	@URIAlias(value = "clearCache")
+	public R clearCache() throws Exception {
+		R r = new R();
+		ReportLineBean.resultCache.clear();
+		r.ok("clear cache ok.");
+		return r;
+	}
 	@Post
 	@URIAlias(value = "file/save")
 	public Map saveFile(String content) {
