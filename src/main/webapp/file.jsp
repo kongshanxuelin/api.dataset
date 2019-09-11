@@ -83,8 +83,8 @@ li {
 	</div>
 	<div class="warning">
 		注：修改该文件即可通过 <a target="_blank" 
-					href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + "/report/id/xxx" %>'> 
-					<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + "/report/id/xxx" %>
+					href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + "<sn:webroot/>/report/id/xxx" %>'> 
+					<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + "<sn:webroot/>/report/id/xxx" %>
 					</a> 访问对应接口，xxx是report节点id的值
 	</div>
 	<textarea id="code" name="code">${c}</textarea>

@@ -51,7 +51,7 @@ public class Home extends AjaxServlet{
 						}
 					}
 					report.setRows(rb.returnReportJSON(HttpUtils.getParamMap(request)));
-					report.setResult(rb.returnReportType(HttpUtils.getParamMap(request)));
+					report.setResult(rb.returnJSResult(HttpUtils.getParamMap(request)));
 				}else { //自己实现完整的报表
 					IReport myReport = ReflectUtil.newInstance(rb.getJava());
 					printOut(response, request, JSON.toJSONString(myReport.genReport(rb,HttpUtils.getParamMap(request))));

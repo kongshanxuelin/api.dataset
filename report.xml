@@ -57,6 +57,13 @@
 		</row>
 	</report>
   
+    
+  	<report id="testJS2" type="int">
+		<row id="abc" label="测试测试" lang="js">
+			return Db.use().del("t_test",{id:1});
+		</row>
+	</report>
+  
   	<report id="qblive" ds="qb" title="测试的" java-align-data="true" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
 		<row label="存储过程 ">
 			<![CDATA[
@@ -92,5 +99,13 @@
             order by bank_nature_name_en,DATE_FORMAT(create_time,'%Y%m')
 			]]>
       </row>
+	</report>
+  
+    <report id="001_sp_GetValidCompanys" ds="qb" title="按月统计有效机构总数" java-align-data="true" startDate="2019-01-01" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
+    <row field-field="dt" field-v="num" label="存储过程 ">
+			<![CDATA[
+				{call 001_sp_GetValidCompanys('${date}')}
+			]]>
+		</row>
 	</report>
 </reports>

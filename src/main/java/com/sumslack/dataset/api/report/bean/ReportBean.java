@@ -247,17 +247,14 @@ public class ReportBean implements Serializable{
 		return rows;
 	}
 	
-	public Object returnReportType(Map paramMap) {
-		if(this.getType().equals("map")) {
-			Map retMap = new HashMap();
-			for(ReportLineBean line : this.lines) {
-				ReportLineVO lineVO = new ReportLineVO();
-				if(line.getResultList()!=null && line.getResultList().size()==1) {
-					retMap.put(line.getId(),line.getResultList().get(0));
-				}
+	public Object returnJSResult(Map paramMap) {
+		Map retMap = new HashMap();
+		for(ReportLineBean line : this.lines) {
+			ReportLineVO lineVO = new ReportLineVO();
+			if(line.getResult()!=null) {
+				retMap.put(line.getId(),line.getResult());
 			}
-			return retMap;
 		}
-		return null;
+		return retMap;
 	}
 }

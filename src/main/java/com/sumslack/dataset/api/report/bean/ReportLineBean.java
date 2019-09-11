@@ -30,8 +30,16 @@ public class ReportLineBean implements Serializable{
 	//针对日期对应的字段名称，默认值：field，针对数据对应的字段名称
 	private String fieldField = "field";  //曲线x坐标
 	private String fieldV = "v";		//曲线Y坐标
-	private String fieldLabel = "label"; //曲线名称
+	private String fieldLabel; //曲线名称
+	//可以直接返回JS对象
+	private Object result;
 	
+	public Object getResult() {
+		return result;
+	}
+	public void setResult(Object result) {
+		this.result = result;
+	}
 	public String getFieldLabel() {
 		return fieldLabel;
 	}
@@ -102,9 +110,13 @@ public class ReportLineBean implements Serializable{
 		if(this.content!=null) {
 			List<Map> dataList = null;
 			if(this.lang.equals("js")) {
-				List res = JSUtil.execRetList("(function(){"+this.content+"})()",paramMap);
-				if(res!=null)
-					dataList = res;
+				//content可能有网页参数
+				String _content = ReportUtil.parseParam(this.content, paramMap);
+				Object res = JSUtil.execRetList("(function(){"+_content+"})()",paramMap);
+				if(res!=null && res instanceof List)
+					dataList = (List)res;
+				else
+					this.result = res;
 			}else {
 				/**
 				 * SQL执行后的数据集可能有label，field和数据三个字段，需要转换成：{label:{title:"",id:""},data:[{field:"",v:""}]}的形式用于前端展现

@@ -87,6 +87,10 @@ public class JSUtil extends ScriptUtil {
 	            }
             }else if(obj instanceof List) {
             	return (List)obj;
+            }else {
+            	List retList = new ArrayList();
+            	retList.add(obj);
+            	return retList;
             }
         } catch (Exception e) {
             e.printStackTrace();
