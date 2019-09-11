@@ -16,6 +16,7 @@ import com.sumslack.dataset.api.report.util.ReportUtil;
 import com.sumslack.excel.R;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
 @URIAlias(value = "/")
 public class ReportController extends BaseController{
@@ -27,6 +28,7 @@ public class ReportController extends BaseController{
 		request.setAttribute("path",filePath);
 		request.setAttribute("c", content);
 		request.setAttribute("ds", CollectionUtil.join(dss, ","));
+		request.setAttribute("time", FileUtil.lastModifiedTime(filePath).getTime());
 		return "/file.jsp";
 	}
 	
@@ -37,15 +39,24 @@ public class ReportController extends BaseController{
 		r.ok("clear cache ok.");
 		return r;
 	}
+	
 	@Post
 	@URIAlias(value = "file/save")
-	public Map saveFile(String content) {
+	public Map saveFile(String content,String time) {
 		Map retMap = new HashMap();
 		retMap.put("ret", 0);
+		
+		long _time = FileUtil.lastModifiedTime(ReportJob.REPORT_FILEPATH).getTime();
+		if(Convert.toLong(time)!=_time) {
+			retMap.put("ret", 502);
+			retMap.put("msg","当前文件已被其他人保存，请拷贝你修改的部分重新刷新页面后保存！");
+			return retMap;
+		}
 		try {
 			ReportUtil.initReports();
 			File file = FileUtil.writeString(content, new File(ReportJob.REPORT_FILEPATH), Charset.forName("UTF-8"));
 			retMap.put("c", FileUtil.readString(file, Charset.forName("UTF-8")));
+			retMap.put("time", FileUtil.lastModifiedTime(ReportJob.REPORT_FILEPATH).getTime());
 		}catch(Exception ex) {
 			ex.printStackTrace();
 			retMap.put("msg", "XML解析出错，请核查XML文件！");

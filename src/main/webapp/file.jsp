@@ -100,6 +100,7 @@ input[type=button] {
 	</div>
 	<textarea id="code" name="code">${c}</textarea>
 	<div class="footer">
+		<input type="hidden" id="time" value="${time}" />
 		<input style="margin-left:10px;" type="button" id="btnCache" value="清空缓存" />		
 	</div>
 	<script type="text/javascript">
@@ -181,11 +182,13 @@ input[type=button] {
 				type:"post",
 				url:"<sn:webroot/>/report/file/save",
 				data:{
-					content:editor.getValue()
+					content:editor.getValue(),
+					time:$("#time").val()
 				},
 				success:function(json){
 					if(json.ret ==0){
 						editor.setValue(json.c);
+						$("#time").val(json.time);
 						var ss  = new Date();
 						$("#tip").html("保存于：" + ss.getHours() + ":" + ss.getMinutes() + ":" + ss.getSeconds());
 					}else{
