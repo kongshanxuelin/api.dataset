@@ -116,4 +116,28 @@
 			]]>
 		</row>
 	</report>
+  
+    <report id="010_sp_DailyActiveTerminalByType" title="按不同机构类型，统计当月有效日活用户" startDate="${fromDate}" endDate="${dateAdd(toDate,-1,'month')?string('yyyy-MM-dd')}" step="month" dateFormat="yyyyMM">
+    <row field-field="dt" field-label="name" field-v="num" label="存储过程">
+			<![CDATA[
+				{call 010_sp_DailyActiveTerminalByType('${fromDate}','${toDate}')}
+			]]>
+		</row>
+	</report>
+  
+  <report id="011_sp_PerOfActiveTerminalByType" ds="qb" title="各种机构类型下 日活用户数相对于日活机构数占比" startDate="${fromDate}" endDate="${dateAdd(toDate,-1,'month')?string('yyyy-MM-dd')}" step="month" dateFormat="yyyyMM">
+    <row field-field="dt" field-label="name" field-v="num" label="存储过程">
+			<![CDATA[
+				{call 011_sp_PerOfActiveTerminalByType('${fromDate}','${toDate}')}
+			]]>
+		</row>
+	</report>
+  
+  <report id="012_sp_MonthlyActiveTerminalByType" ds="qb" title="按不同机构类型，统计当月有效用户" startDate="${fromDate}" endDate="${dateAdd(toDate,-1,'month')?string('yyyy-MM-dd')}" step="month" dateFormat="yyyyMM">
+    <row field-field="dt" field-label="name" field-v="num" label="存储过程">
+			<![CDATA[
+				{call 012_sp_MonthlyActiveTerminalByType('${fromDate}','${toDate}')}
+			]]>
+		</row>
+	</report>
 </reports>

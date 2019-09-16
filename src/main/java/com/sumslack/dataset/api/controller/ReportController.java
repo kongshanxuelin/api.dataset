@@ -49,7 +49,7 @@ public class ReportController extends BaseController{
 		long _time = FileUtil.lastModifiedTime(ReportJob.REPORT_FILEPATH).getTime();
 		if(Convert.toLong(time)!=_time) {
 			retMap.put("ret", 502);
-			retMap.put("msg","当前文件已被其他人保存，请拷贝你修改的部分重新刷新页面后保存！");
+			retMap.put("msg","保存失败！！！当前文件已被其他人保存，请刷新页面再保存！");
 			return retMap;
 		}
 		try {
