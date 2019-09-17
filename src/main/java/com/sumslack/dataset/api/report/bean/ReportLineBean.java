@@ -29,10 +29,20 @@ public class ReportLineBean implements Serializable{
 	private String ds;
 	private String lang;
 	
+	private boolean showTotal = false; //是否显示汇总行
+	private String totalFormatter = "#"; 
+	
 	//针对日期对应的字段名称，默认值：field，针对数据对应的字段名称
 	private String fieldField = "field";  //曲线x坐标
 	private String fieldV = "v";		//曲线Y坐标
 	private String fieldLabel; //曲线名称
+	
+	public String getTotalFormatter() {
+		return totalFormatter;
+	}
+	public void setTotalFormatter(String totalFormatter) {
+		this.totalFormatter = totalFormatter;
+	}
 	//可以直接返回JS对象
 	private Object result;
 	
@@ -115,6 +125,12 @@ public class ReportLineBean implements Serializable{
 		return Convert.toStr(report.getId()) + "-" + key.hashCode();
 	}
 	
+	public boolean isShowTotal() {
+		return showTotal;
+	}
+	public void setShowTotal(boolean showTotal) {
+		this.showTotal = showTotal;
+	}
 	public void init(ReportBean report,Map paramMap) throws Exception{
 		if(this.content!=null) {
 			List<Map> dataList = null;

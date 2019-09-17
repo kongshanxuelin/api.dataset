@@ -134,7 +134,7 @@
 	</report>
   
   <report id="012_sp_MonthlyActiveTerminalByType" ds="qb" title="按不同机构类型，统计当月有效用户" startDate="${fromDate}" endDate="${dateAdd(toDate,-1,'month')?string('yyyy-MM-dd')}" step="month" dateFormat="yyyyMM">
-    <row field-field="dt" field-label="name" field-v="num" label="存储过程">
+    <row field-field="dt" field-label="name" field-v="num" label="存储过程" show-total="true" total-format="#.##">
 			<![CDATA[
 				{call 012_sp_MonthlyActiveTerminalByType('${fromDate}','${toDate}')}
 			]]>

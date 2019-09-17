@@ -10,8 +10,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.compress.utils.Lists;
-
 import com.sumscope.tag.rest.TagRest;
 import com.sumscope.tag.rest.servlet.AjaxServlet;
 import com.sumscope.tag.util.HttpUtils;
@@ -19,7 +17,6 @@ import com.sumscope.tag.util.StrUtil;
 import com.sumslack.dataset.api.report.bean.ReportBean;
 import com.sumslack.dataset.api.report.util.IReport;
 import com.sumslack.dataset.api.report.util.ReportUtil;
-import com.sumslack.dataset.api.report.vo.ReportColVO;
 import com.sumslack.dataset.api.report.vo.ReportLineVO;
 import com.sumslack.dataset.api.report.vo.ReportVO;
 

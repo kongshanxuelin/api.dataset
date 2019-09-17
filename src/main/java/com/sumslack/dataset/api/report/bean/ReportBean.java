@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.compress.utils.Lists;
+
+import com.sumscope.tag.util.StrUtil;
 import com.sumslack.dataset.api.report.util.ReportUtil;
 import com.sumslack.dataset.api.report.vo.ReportColVO;
 import com.sumslack.dataset.api.report.vo.ReportLineLabelVO;
@@ -17,7 +20,7 @@ import com.sumslack.dataset.api.report.vo.ReportLineVO;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.db.Entity;
 
 public class ReportBean implements Serializable{
@@ -215,7 +218,7 @@ public class ReportBean implements Serializable{
 	public List<ReportLineVO> returnReportJSON(Map paramMap) throws Exception{
 		List<ReportLineVO> rows = new ArrayList();
 		for(ReportLineBean line : this.lines) {
-			if(StrUtil.isBlankIfStr(line.getFieldLabel())) {
+			if(cn.hutool.core.util.StrUtil.isBlankIfStr(line.getFieldLabel())) {
 				ReportLineVO lineVO = new ReportLineVO();
 				ReportLineLabelVO label = new ReportLineLabelVO(line.getId(),line.getLabel(),line.getAlign(),line.getFontWeight());
 				lineVO.setLabel(label);
@@ -256,9 +259,46 @@ public class ReportBean implements Serializable{
 					lineVO.setData(thisDataList);
 					rows.add(lineVO);
 				}
+				//是否需要汇总
+				renderDataList(rows,line);
 			}
 		}
 		return rows;
+	}
+	
+	private void renderDataList(List<ReportLineVO> lines,ReportLineBean line) {
+		if(line.isShowTotal() && lines.size()>0) {
+			ReportLineVO totalLine = new ReportLineVO();
+			ReportLineLabelVO label = new ReportLineLabelVO();
+			label.setTitle("Total");
+			totalLine.setLabel(label);
+			List data = Lists.newArrayList();
+			
+			ReportLineVO _first = lines.get(0);
+			List<Map> _dataList = _first.getData();
+			List<String> cols = _dataList.stream().map(item -> StrUtil.formatNullStr(item.get("field"))).collect(Collectors.toList());
+			
+			for(String col:cols) {
+				Map map = new HashMap();
+				//TODO:这里不对
+				double dd = lines.stream().map(_line -> {
+					List<Map> itemList = (List)_line.getData();
+					Optional<Map> _map = itemList.stream().filter(s -> StrUtil.formatNullStr(s.get("field")).equals(col) && NumberUtil.isNumber(StrUtil.formatNullStr(s.get("v")))).findFirst();
+					Map _defaultMap = new HashMap();
+					_defaultMap.put("field", col);
+					_defaultMap.put("v", 0);
+					return _map.isPresent()?_map.get():_defaultMap;
+				}).mapToDouble(item -> {
+					return Convert.toDouble(item.get("v"));
+				})
+				.sum();
+				map.put("field", col);
+				map.put(col, NumberUtil.decimalFormat(line.getTotalFormatter(), dd));
+				data.add(map);
+			}
+			totalLine.setData(data);
+			lines.add(totalLine);
+		}
 	}
 	
 	public Object returnJSResult(Map paramMap) {

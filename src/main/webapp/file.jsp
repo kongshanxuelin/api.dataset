@@ -136,6 +136,8 @@ input[type=button] {
 					align : [ "left", "center", "right" ],
 					fontWeight : [ "normal", "bold" ],
 					lang:["sql","js"],
+					"show-total":["true","false"],
+					"total-format":["#","#.##%","0.00","00.000",",###","##0.00"],
 					"field-field":null,
 					"field-v":"",
 					"field-label":null

@@ -60,6 +60,9 @@ public class ReportUtil {
 						rl.setFontWeight(line.getAttribute("fontWeight"));
 						rl.setLang(StrUtil.formatNullStr(line.getAttribute("lang"),"sql"));
 						
+						rl.setShowTotal(StrUtil.formatNullStr(line.getAttribute("show-total"),"false").equals("true"));
+						rl.setTotalFormatter(StrUtil.formatNullStr(line.getAttribute("total-format"),"#"));
+						
 						rl.setFieldField(StrUtil.formatNullStr(line.getAttribute("field-field"),"field"));
 						rl.setFieldV(StrUtil.formatNullStr(line.getAttribute("field-v"),"v"));
 						rl.setFieldLabel(StrUtil.formatNullStr(line.getAttribute("field-label")));
