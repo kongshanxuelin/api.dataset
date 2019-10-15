@@ -36,12 +36,13 @@ public class ExportServlet extends AjaxServlet{
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String ids = StrUtil.formatNullStr(req.getParameter("ids"));
+		String fileName = StrUtil.formatNullStr(req.getParameter("file"),"report");
 		String[] idArray = StrUtil.split(ids, ",");
 		ExcelWriter ee = ExcelUtil.getWriter("export.xls");
 		if(idArray!=null) {
 			for(String reportId : idArray) {
 				List<ReportLineVO> list = null;
-				ReportBean rb = ReportUtil.getReport(reportId);
+				ReportBean rb = ReportUtil.getReport(fileName,reportId);
 				//这种情况下，需要SQL或存储过程定义数据集
 				if(StrUtil.isEmpty(rb.getJava())) {
 					rb.init(HttpUtils.getParamMap(req));

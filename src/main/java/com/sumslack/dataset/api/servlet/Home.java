@@ -19,7 +19,7 @@ import com.sumslack.dataset.api.report.vo.ReportVO.RET;
 
 import cn.hutool.core.util.ReflectUtil;
 
-@TagRest(value="report/id/*")
+@TagRest(value="report/id/*/*")
 public class Home extends AjaxServlet{
 	/**
 	 * 
@@ -32,8 +32,9 @@ public class Home extends AjaxServlet{
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		ReportVO report = new ReportVO();
 		report.setRet(ReportVO.RET.SUCCESS);
-		String reportId = StrUtil.formatNullStr(request.getAttribute("$1"));
-		ReportBean rb = ReportUtil.getReport(reportId);
+		String fileName = StrUtil.formatNullStr(request.getAttribute("$1"));
+		String reportId = StrUtil.formatNullStr(request.getAttribute("$2"));
+		ReportBean rb = ReportUtil.getReport(fileName,reportId);
 		try {
 			if(rb!=null) {
 				//这种情况下，需要SQL或存储过程定义数据集

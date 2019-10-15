@@ -44,7 +44,11 @@
 		
 		<item name="dao-scan-package" value="com.sumslack.dataset.api.dao"/>
 		
-		<item name="reportFilePath" value="C:/Users/user/eclipse-workspace/dataset.api/report.xml" />
+		<item name="reportFilePath" value="C:/Users/user/eclipse-workspace/dataset.api/xml/" />
+		
+		<!-- 极光推送API -->
+		<item name="jpush_key" value="e1bc17d6ead77fed166c315e" />
+		<item name="jpush_sec" value="5024509ecc7c9b79cfce1efc" />
 		
 	</global>
 	<caches>

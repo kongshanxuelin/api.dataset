@@ -94,13 +94,14 @@ input[type=button] {
 	</div>
 	<div class="warning">
 		注：修改该文件即可通过 <a target="_blank" 
-					href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() +  "/report/id/xxx" %>'> 
-					<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/report/id/xxx" %>
+					href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() +  "/report/id/"+ request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf(".")) +"/xxx" %>'> 
+					<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/report/id/"+request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf("."))+"/xxx" %>
 					</a> 访问对应接口，xxx是report节点id的值
 	</div>
 	<textarea id="code" name="code">${c}</textarea>
 	<div class="footer">
 		<input type="hidden" id="time" value="${time}" />
+		<input type="hidden" id="file" value="${file}" />
 		<input style="margin-left:10px;" type="button" id="btnCache" value="清空缓存" />		
 	</div>
 	<script type="text/javascript">
@@ -185,7 +186,8 @@ input[type=button] {
 				url:"<sn:webroot/>/report/file/save",
 				data:{
 					content:editor.getValue(),
-					time:$("#time").val()
+					time:$("#time").val(),
+					file:$("#file").val()
 				},
 				success:function(json){
 					if(json.ret ==0){
@@ -253,7 +255,9 @@ input[type=button] {
                 name: 'file',
                 action: '<sn:webroot/>/excel/upload',
                 enctype: 'multipart/form-data',
-                params: {},
+                params: {
+                	file:$("#file").val()
+                },
                 autoSubmit: true,
                 onSubmit: function() {},
                 onComplete: function(data) {

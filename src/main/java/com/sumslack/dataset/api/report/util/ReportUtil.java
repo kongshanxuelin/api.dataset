@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.compress.utils.Lists;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -18,20 +19,37 @@ import com.sumslack.dataset.api.report.bean.ReportLineBean;
 import com.sumslack.dataset.api.report.job.ReportJob;
 import com.sumslack.freemarker.functions.DateAdd;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.XmlUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 public class ReportUtil {
-	public static List<ReportBean> reportList = null;
-	public static List<ReportBean> initReports(){
-		reportList = new ArrayList();
+	public static Map<String,List<ReportBean>> reportCache = new HashMap();
+	
+	public static Map<String,List<ReportBean>> initReports(String fileName){
+		if(fileName.equals("all")) {
+			FileUtil.listFileNames(ReportJob.REPORT_FILEPATH).forEach(_name -> {
+				if( !StrUtil.isEmpty(_name) && !_name.startsWith("#") && _name.endsWith(".xml")) {
+					initReportFileName(_name);
+				}
+			});
+		}else {
+			initReportFileName(fileName);
+		}
 		//ClassPathResource resource = new ClassPathResource("report.xml");
 		//Document doc = XmlUtil.readXML(resource.getStream());
-		Document doc = XmlUtil.readXML(ReportJob.REPORT_FILEPATH);
+		
+		return reportCache;
+	}
+	
+	
+	private static void initReportFileName(String fileName) {
+		Document doc = XmlUtil.readXML(ReportJob.REPORT_FILEPATH + fileName);
 		Element rootElement = XmlUtil.getRootElement(doc);
 		String dsDefault = StrUtil.formatNullStr(rootElement.getAttribute("ds"));
 		List<Element> reports = XmlUtil.getElements(rootElement, "report");
+		List<ReportBean> reportList = Lists.newArrayList();
 		if(reports!=null) {
 			for(Element report : reports) {
 				String _title = StrUtil.formatNullStr(report.getAttribute("title"));
@@ -76,9 +94,8 @@ public class ReportUtil {
 				reportList.add(rp);
 			}
 		}
-		return reportList;
+		reportCache.put(fileName,reportList);
 	}
-	
 	
 	public static String parseParam(String str,Map paramMap) throws Exception{
 		Configuration cfg = new Configuration();    
@@ -95,7 +112,11 @@ public class ReportUtil {
         return writer.toString();
 	}
 	
-	public static ReportBean getReport(String id) {
+	public static ReportBean getReport(String fileName,String id) {
+		List<ReportBean> reportList = reportCache.get(fileName);
+		if(reportList == null) {
+			reportList = reportCache.get(fileName + ".xml");
+		}
 		if(reportList!=null) {
 			Optional<ReportBean> _rb = reportList.stream().filter(s -> s.getId().equalsIgnoreCase(id)).findFirst();
 			if(_rb.isPresent())

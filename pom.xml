@@ -8,7 +8,7 @@
   <name>JSPTagEx Maven Webapp</name>
   <url>http://maven.apache.org</url>
   <properties>
-	<jsptagex.version>1.2.5</jsptagex.version>
+	<jsptagex.version>1.3.2</jsptagex.version>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
@@ -77,6 +77,14 @@
 		    <artifactId>xmlbeans</artifactId>
 		    <version>3.1.0</version>
 		</dependency>
+		
+		<!-- jpush -->
+		<dependency>
+		    <groupId>cn.jpush.api</groupId>
+		    <artifactId>jpush-client</artifactId>
+		    <version>3.4.2</version>
+		</dependency>
+		
   </dependencies>
   <repositories>
   	<repository>

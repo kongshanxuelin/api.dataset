@@ -17,11 +17,12 @@ import cn.hutool.core.io.watch.WatchMonitor;
 import cn.hutool.core.io.watch.Watcher;
 
 public class ReportJob extends TagJob{
+	//配置文件所在目录
 	public static final String REPORT_FILEPATH = StrUtil.formatNullStr(TagConst.globalMap.get("reportFilePath"));
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		//首次初始化配置
-		ReportUtil.initReports();
+		ReportUtil.initReports("all");
 		File file = FileUtil.file(REPORT_FILEPATH);
 		WatchMonitor watchMonitor = WatchMonitor.create(file, WatchMonitor.ENTRY_MODIFY);
 		watchMonitor.setWatcher(new Watcher(){
@@ -34,7 +35,7 @@ public class ReportJob extends TagJob{
 		    public void onModify(WatchEvent<?> event, Path currentPath) {
 		        Object obj = event.context();
 		        //修改文件了需要更新缓存
-		        ReportUtil.initReports();
+		        ReportUtil.initReports(currentPath.getFileName().toString());
 		    }
 
 		    @Override

@@ -6,10 +6,11 @@ import com.sumscope.tag.aop.IAOPCallback;
 
 public class ControllerInterceptor implements IAOPCallback{
 
-	public void before(Object obj, Object[] args) {
+	public boolean before(Object obj, Object[] args) {
 		if(obj instanceof HttpServletRequest){
 			HttpServletRequest controller = (HttpServletRequest)obj;
 		}
+		return true;
 	}
 
 	public void after(Object obj, Object[] args) {
