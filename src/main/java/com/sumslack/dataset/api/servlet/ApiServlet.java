@@ -49,11 +49,11 @@ public class ApiServlet extends AjaxServlet{
 					if(api.getLang().equals("js")) {
 						report = new ReportVO();
 						report.setRet(ReportVO.RET.SUCCESS);
-						report.setResult(api.invokeJavascript(HttpUtils.getParamMap(request)));
+						report.setResult(api.invokeJavascript(fileName,api,HttpUtils.getParamMap(request)));
 						report.setTitle(api.getTitle());
 					}else if(api.getLang().equals("java")) {
 						IApi myReport = ReflectUtil.newInstance(api.getContent());
-						printOut(response, request, JSON.toJSONString(myReport.genApi(api,HttpUtils.getParamMap(request))));
+						printOut(response, request, JSON.toJSONString(myReport.genApi(fileName,api,HttpUtils.getParamMap(request))));
 					}
 				}
 			}else {

@@ -14,7 +14,7 @@ import com.sumslack.dataset.api.report.vo.ReportVO.RET;
 
 public class ReportTest implements IReport{
 	@Override
-	public ReportVO genReport(ReportBean rb, Map paramMap) {
+	public ReportVO genReport(String fileName,ReportBean rb, Map paramMap) {
 		ReportVO rr = new ReportVO();
 		List<ReportColVO> cols = new ArrayList(); 
 		cols.add(new ReportColVO("201902", "201902"));

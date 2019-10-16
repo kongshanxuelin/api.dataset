@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.compress.utils.Lists;
+import org.w3c.dom.Element;
 
 import com.sumscope.tag.util.StrUtil;
 import com.sumslack.dataset.api.report.util.ReportUtil;
@@ -24,6 +25,7 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.db.Entity;
 
 public class ReportBean implements Serializable{
+	private Element reports;
 	private String id;
 	private String title;
 	private String subtitle;
@@ -41,6 +43,12 @@ public class ReportBean implements Serializable{
 	private boolean javaAlignData;
 	private List<ReportLineBean> lines;
 	
+	public Element getReports() {
+		return reports;
+	}
+	public void setReports(Element reports) {
+		this.reports = reports;
+	}
 	public String getType() {
 		return type;
 	}

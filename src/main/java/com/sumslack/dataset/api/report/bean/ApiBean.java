@@ -3,7 +3,8 @@ package com.sumslack.dataset.api.report.bean;
 import java.io.Serializable;
 import java.util.Map;
 
-import com.sumslack.dataset.api.report.util.ReportUtil;
+import javax.sql.DataSource;
+
 import com.sumslack.excel.JSUtil;
 
 import cn.hutool.core.util.StrUtil;
@@ -15,7 +16,13 @@ public class ApiBean implements Serializable{
 	private String type="map"; 
 	private String lang="js";
 	private String content;
-	
+	private String ds = "default";
+	public String getDs() {
+		return ds;
+	}
+	public void setDs(String ds) {
+		this.ds = ds;
+	}
 	//可以直接返回JS对象
 	private Object result;
 	
@@ -61,10 +68,10 @@ public class ApiBean implements Serializable{
 	public void setResult(Object result) {
 		this.result = result;
 	}
-	public Object invokeJavascript(Map paramMap) throws Exception{
+	public Object invokeJavascript(String fileName,ApiBean api,Map paramMap) throws Exception{
 		if(!StrUtil.isEmpty(this.content)) {
 			//String _content = ReportUtil.parseParam(this.content, paramMap);
-			this.result = JSUtil.execRetApi("(function(){"+content+"})()",paramMap);
+			this.result = JSUtil.execRetApi(fileName,api,"(function(){"+content+"})()",paramMap);
 		}
 		return this.result;
 	}

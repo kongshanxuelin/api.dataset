@@ -9,9 +9,11 @@ import javax.sql.DataSource;
 
 import org.apache.commons.compress.utils.Lists;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sumscope.tag.TagConst;
+import com.sumslack.dataset.api.report.bean.DatasourceBean;
 
 import cn.hutool.db.DbUtil;
 import cn.hutool.db.Entity;
@@ -27,6 +29,16 @@ public class Db {
 	}
 	public Db use() {
 		this.ds = TagConst.dataSourceMap.get("default").getDataSource();
+		return this;
+	}
+	public Db use(DatasourceBean dsBean) {
+		if(dsBean!=null) {
+			DruidDataSource ds2 = new DruidDataSource();
+			ds2.setUrl(dsBean.getUrl());
+			ds2.setUsername(dsBean.getUser());
+			ds2.setPassword(dsBean.getPassword());
+			this.ds = ds2;
+		}
 		return this;
 	}
 	public List<Entity> query(String sql,Object... params) {

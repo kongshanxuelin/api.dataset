@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +16,9 @@ import java.util.regex.Pattern;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
+import com.sumslack.dataset.api.report.bean.ApiBean;
+import com.sumslack.dataset.api.report.bean.DatasourceBean;
+import com.sumslack.dataset.api.report.util.ReportUtil;
 import com.sumslack.js.Db;
 import com.sumslack.js.JSFunc;
 
@@ -31,12 +35,11 @@ public class JSUtil extends ScriptUtil {
     private static String JAVASCRIPT_TEMPLATE = "JSTool.js";
     private static ClassPathResource resource = new ClassPathResource(JAVASCRIPT_TEMPLATE);
     static FileReader fileReader;
-    static ScriptEngine engine = getScript("javascript");
+    public static ScriptEngine engine = getScript("javascript");
     static {
     	Set<Class<?>> classes = ClassUtil.scanPackageByAnnotation("com.sumslack.js", JSFunc.class);
     	if(classes!=null) {
     		for(Class<?> cls : classes) {
-    			//cls.newInstance();
     			Object obj = ReflectUtil.newInstance(cls);
     			JSFunc jsfunc = AnnotationUtil.getAnnotation(cls, JSFunc.class);
     			engine.put(jsfunc.id(), obj);
@@ -112,7 +115,7 @@ public class JSUtil extends ScriptUtil {
         return null;
     }
     
-    public static Object execRetApi(String script, Map<String, Object> args) {
+    public static Object execRetApi(String fileName,ApiBean api,String script, Map<String, Object> args) {
         try {
             if (script == null || script.equals("")) {
                 return null;
@@ -124,7 +127,11 @@ public class JSUtil extends ScriptUtil {
                 }
             }
             engine.put("params", paramMap);
-            
+            //如果被调用的api节点指定的数据源，则使用该数据源
+            if(ReportUtil.getDatasourceCache(fileName)!=null) {
+            	Optional<DatasourceBean> _dsBean = ReportUtil.getDatasourceCache(fileName).stream().filter(s -> s.getName().equals(api.getDs())).findFirst();
+            	engine.put("Db",new Db().use(_dsBean.isPresent()?_dsBean.get():null));
+            }
             Object obj = engine.eval(script);
             if(obj instanceof ScriptObjectMirror) {
 	            ScriptObjectMirror res = (ScriptObjectMirror)obj;

@@ -6,5 +6,5 @@ import com.sumslack.dataset.api.report.bean.ReportBean;
 import com.sumslack.dataset.api.report.vo.ReportVO;
 
 public interface IReport {
-	public ReportVO genReport(ReportBean rb,Map paramMap);
+	public ReportVO genReport(String fileName,ReportBean rb,Map paramMap);
 }

@@ -56,7 +56,7 @@ public class ExportServlet extends AjaxServlet{
 					}
 				}else { //自己实现完整的报表
 					IReport myReport = ReflectUtil.newInstance(rb.getJava());
-					ReportVO report = myReport.genReport(rb,HttpUtils.getParamMap(req));
+					ReportVO report = myReport.genReport(fileName,rb,HttpUtils.getParamMap(req));
 					list = report.getRows();
 				}
 				if(list!=null && list.size()>0 && list instanceof List) {

@@ -7,28 +7,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.compress.utils.Lists;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.sumscope.tag.util.StrUtil;
 import com.sumslack.dataset.api.report.bean.ApiBean;
+import com.sumslack.dataset.api.report.bean.DatasourceBean;
 import com.sumslack.dataset.api.report.bean.ReportBean;
 import com.sumslack.dataset.api.report.bean.ReportLineBean;
 import com.sumslack.dataset.api.report.job.ReportJob;
 import com.sumslack.freemarker.functions.DateAdd;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.XmlUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 public class ReportUtil {
+	private static final Element _dsEle = null;
 	public static Map<String,List<ReportBean>> reportCache = new HashMap();
 	public static Map<String,List<ApiBean>> apiCache = new HashMap();
+	public static Map<String,List<DatasourceBean>> dsCache = new HashMap();
 	
+	public static List<DatasourceBean> getDatasourceCache(String name){
+		if(dsCache.containsKey(name)) {
+			return dsCache.get(name);
+		}else if(dsCache.containsKey(name+".xml")) {
+			return dsCache.get(name+".xml");
+		}
+		return null;
+	}
 	public static Map<String,List<ReportBean>> initReports(String fileName){
 		if(fileName.equals("all")) {
 			FileUtil.listFileNames(ReportJob.REPORT_FILEPATH).forEach(_name -> {
@@ -51,6 +66,32 @@ public class ReportUtil {
 		Element rootElement = XmlUtil.getRootElement(doc);
 		Element reportsElement = XmlUtil.getElement(rootElement, "reports");
 		Element apisElement = XmlUtil.getElement(rootElement, "apis");
+		Element datasourcesElement = XmlUtil.getElement(rootElement, "datasources");
+		//数据源定义
+		if(datasourcesElement!=null) {
+			List<Element> dsList = XmlUtil.getElements(datasourcesElement, "datasource");
+			if(dsList!=null) {
+				List<DatasourceBean> dsBeanList = Lists.newArrayList();
+				for(Element _dsEle : dsList) {
+					List<Element> propertyList = XmlUtil.getElements(_dsEle, "property");
+					if(propertyList!=null) {
+						Optional<Element> driverEle = propertyList.stream().filter(s -> Convert.toStr(s.getAttribute("name"),"").equals("driver")).findFirst();
+						Optional<Element> urlEle = propertyList.stream().filter(s -> Convert.toStr(s.getAttribute("name"),"").equals("url")).findFirst();
+						Optional<Element> userEle = propertyList.stream().filter(s -> Convert.toStr(s.getAttribute("name"),"").equals("user")).findFirst();
+						Optional<Element> passEle = propertyList.stream().filter(s -> Convert.toStr(s.getAttribute("name"),"").equals("password")).findFirst();
+						DatasourceBean _ds  = new DatasourceBean();
+						_ds.setDriver(driverEle.isPresent()?Convert.toStr(driverEle.get().getAttribute("value")):null);
+						_ds.setUrl(urlEle.isPresent()?Convert.toStr(urlEle.get().getAttribute("value")):null);
+						_ds.setUser(userEle.isPresent()?Convert.toStr(userEle.get().getAttribute("value")):null);
+						_ds.setPassword(passEle.isPresent()?Convert.toStr(passEle.get().getAttribute("value")):null);
+						_ds.setName(Convert.toStr(_dsEle.getAttribute("name")));
+						dsBeanList.add(_ds);
+					}
+				}
+				dsCache.put(fileName, dsBeanList);
+			}
+		}
+		//API接口定义
 		if(apisElement!=null) {
 			List<Element> apiList = XmlUtil.getElements(apisElement, "api");
 			if(apiList!=null) {
@@ -64,12 +105,30 @@ public class ReportUtil {
 					apiBean.setAuth(StrUtil.formatNullStr(api.getAttribute("auth"),"false").equals("true"));
 					apiBean.setLang(StrUtil.formatNullStr(api.getAttribute("lang"),"js"));
 					apiBean.setType(StrUtil.formatNullStr(api.getAttribute("type")));
-					apiBean.setContent(getCDData(api)); 
+					apiBean.setContent(getCDData(api));
+//					Map<String,DataSource> datasources = new HashMap();
+//					if(datasourcesElement!=null) {
+//						List<DatasourceBean> dsBeanList = dsCache.get(fileName);
+//						dsBeanList.stream().forEach(dsBean -> {
+//							DruidDataSource ds2 = new DruidDataSource();
+//							ds2.setUrl(dsBean.getUrl());
+//							ds2.setUsername(dsBean.getUser());
+//							ds2.setPassword(dsBean.getPassword());
+//							datasources.put(dsBean.getName(), ds2);
+//						});
+//					}
+//					apiBean.setDatasources(datasources);
+					if(api.hasAttribute("ds")) {
+						apiBean.setDs(Convert.toStr(api.getAttribute("ds")));	
+					}else {
+						apiBean.setDs(Convert.toStr(apisElement.getAttribute("ds"),""));
+					}
 					apiBeanList.add(apiBean);
 				}
 				apiCache.put(fileName, apiBeanList);
 			}
 		}
+		//数据集定义
 		if(reportsElement!=null) {
 			String dsDefault = StrUtil.formatNullStr(reportsElement.getAttribute("ds"));
 			List<Element> reports = XmlUtil.getElements(reportsElement, "report");
@@ -79,6 +138,7 @@ public class ReportUtil {
 					String _title = StrUtil.formatNullStr(report.getAttribute("title"));
 					if(_title.startsWith("//")) continue;
 					ReportBean rp = new ReportBean();
+					rp.setReports(reportsElement);
 					rp.setId(StrUtil.formatNullStr(report.getAttribute("id")));
 					rp.setTitle(_title);
 					rp.setSubtitle(report.getAttribute("subtitle"));
