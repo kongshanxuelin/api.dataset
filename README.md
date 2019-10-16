@@ -62,7 +62,7 @@ v1.0.0
 	<api id="login" lang="js" title="登录接口">
 		<![CDATA[			
 		logger.d("start login...");
-		var _user = Db.use().one("select id,user_name from user where user_name = ? and password = ?",params.username,params.password);
+		var _user = Db.one("select id,user_name from user where user_name = ? and password = ?",params.username,params.password);
 		if(_user!=null){
 			var _token = Auth.genToken();
 			var userBean = {userid:_user.id,username:_user.user_name,token:_token};
@@ -80,8 +80,11 @@ v1.0.0
 		Auth.logout("${token}","${userid}");
 		return "logout ok";
 	</api>
-  <api id="array" lang="js" auth="true" title="需要验证的测试接口">
+  	<api id="array" lang="js" auth="true" title="需要验证的测试接口">
 		return [{a:1},{a:2}];
+	</api>
+	<api id="testds" lang="js" ds="test" title="测试自定义数据源">
+		return Db.list("select * from base_user where uid>?",0);
 	</api>
 </apis>
 </xml>
