@@ -12,6 +12,7 @@ import com.sumscope.tag.rest.servlet.AjaxServlet;
 import com.sumscope.tag.util.HttpUtils;
 import com.sumscope.tag.util.StrUtil;
 import com.sumslack.dataset.api.report.bean.ReportBean;
+import com.sumslack.dataset.api.report.util.AuthManager;
 import com.sumslack.dataset.api.report.util.IReport;
 import com.sumslack.dataset.api.report.util.ReportUtil;
 import com.sumslack.dataset.api.report.vo.ReportVO;
@@ -20,11 +21,12 @@ import com.sumslack.dataset.api.report.vo.ReportVO.RET;
 import cn.hutool.core.util.ReflectUtil;
 
 @TagRest(value="report/id/*/*")
-public class Home extends AjaxServlet{
+public class ReportServlet extends AjaxServlet{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8814286860867527336L;
+
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -37,31 +39,40 @@ public class Home extends AjaxServlet{
 		ReportBean rb = ReportUtil.getReport(fileName,reportId);
 		try {
 			if(rb!=null) {
-				//这种情况下，需要SQL或存储过程定义数据集
-				if(StrUtil.isEmpty(rb.getJava())) {
-					rb.init(HttpUtils.getParamMap(request));
-					report = new ReportVO();
-					report.setRet(ReportVO.RET.SUCCESS);
-					if(!StrUtil.isEmpty(rb.getStartDate()) && !StrUtil.isEmpty(rb.getEndDate())) {
-						try {
-							report.setCols(rb.getCols(HttpUtils.getParamMap(request)));
-						} catch (Exception e) {
-							e.printStackTrace();
-							report.setRet(ReportVO.RET.ERROR);
-							report.setErrMsg("发生错误：" + e.getMessage());
-						}
+				//验证接口是否需要登录才能访问
+				if(rb.isAuth()) {
+					if(!AuthManager.getInstance().checkToken(AuthManager.getInstance().getTokenFromWeb(request))) {
+						report.setRet(ReportVO.RET.NOTAUTH);
+						report.setErrMsg("未传入token或传入的token值不对！");
 					}
-					report.setRows(rb.returnReportJSON(HttpUtils.getParamMap(request)));
-					report.setResult(rb.returnJSResult(HttpUtils.getParamMap(request)));
-					report.setTitle(rb.getTitle());
-				}else { //自己实现完整的报表
-					IReport myReport = ReflectUtil.newInstance(rb.getJava());
-					printOut(response, request, JSON.toJSONString(myReport.genReport(rb,HttpUtils.getParamMap(request))));
+				}else {
+					//这种情况下，需要SQL或存储过程定义数据集
+					if(StrUtil.isEmpty(rb.getJava())) {
+						rb.init(HttpUtils.getParamMap(request));
+						report = new ReportVO();
+						report.setRet(ReportVO.RET.SUCCESS);
+						if(!StrUtil.isEmpty(rb.getStartDate()) && !StrUtil.isEmpty(rb.getEndDate())) {
+							try {
+								report.setCols(rb.getCols(HttpUtils.getParamMap(request)));
+							} catch (Exception e) {
+								e.printStackTrace();
+								report.setRet(ReportVO.RET.ERROR);
+								report.setErrMsg("发生错误：" + e.getMessage());
+							}
+						}
+						report.setRows(rb.returnReportJSON(HttpUtils.getParamMap(request)));
+						report.setResult(rb.returnJSResult(HttpUtils.getParamMap(request)));
+						report.setTitle(rb.getTitle());
+					}else { //自己实现完整的报表
+						IReport myReport = ReflectUtil.newInstance(rb.getJava());
+						printOut(response, request, JSON.toJSONString(myReport.genReport(rb,HttpUtils.getParamMap(request))));
+					}
 				}
 			}else {
 				report.setRet(ReportVO.RET.NOTFOUND);
 				report.setErrMsg("找不到该报表，请在report.xml中定义report节点id为 【" + reportId + "】 的节点！");
 			}
+			
 			printOut(response, request, JSON.toJSONString(report));
 		}catch(Exception ex) {
 			ex.printStackTrace();

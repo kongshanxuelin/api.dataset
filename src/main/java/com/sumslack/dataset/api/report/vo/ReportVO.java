@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ReportVO {
 	
-	public static enum RET {SUCCESS,NOTFOUND,ERROR};
+	public static enum RET {SUCCESS,NOTFOUND,ERROR,NOTAUTH};
 	
 	private RET ret;
 	private String errMsg;

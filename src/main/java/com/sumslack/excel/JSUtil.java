@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,9 +16,13 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 import com.sumslack.js.Db;
+import com.sumslack.js.JSFunc;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.lang.Console;
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.script.ScriptUtil;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
@@ -28,7 +33,16 @@ public class JSUtil extends ScriptUtil {
     static FileReader fileReader;
     static ScriptEngine engine = getScript("javascript");
     static {
-    	engine.put("Db", new Db());
+    	Set<Class<?>> classes = ClassUtil.scanPackageByAnnotation("com.sumslack.js", JSFunc.class);
+    	if(classes!=null) {
+    		for(Class<?> cls : classes) {
+    			//cls.newInstance();
+    			Object obj = ReflectUtil.newInstance(cls);
+    			JSFunc jsfunc = AnnotationUtil.getAnnotation(cls, JSFunc.class);
+    			engine.put(jsfunc.id(), obj);
+    		}
+    	}
+    	
     }
 
     static {
@@ -91,6 +105,40 @@ public class JSUtil extends ScriptUtil {
             	List retList = new ArrayList();
             	retList.add(obj);
             	return retList;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public static Object execRetApi(String script, Map<String, Object> args) {
+        try {
+            if (script == null || script.equals("")) {
+                return null;
+            }
+            Map paramMap = new HashMap();
+            if (args != null || !args.isEmpty()) {
+                for (Map.Entry<String, Object> entry : args.entrySet()) {
+                    paramMap.put(entry.getKey(), entry.getValue());
+                }
+            }
+            engine.put("params", paramMap);
+            
+            Object obj = engine.eval(script);
+            if(obj instanceof ScriptObjectMirror) {
+	            ScriptObjectMirror res = (ScriptObjectMirror)obj;
+	            if(res.isArray()) {
+	            	Collection<Object> vvs = res.values();
+	            	if(vvs!=null)
+	            		return new ArrayList(vvs);
+	            	else
+	            		return res;
+	            }else {
+	            	return res;
+	            }
+            }else {
+            	return obj;
             }
         } catch (Exception e) {
             e.printStackTrace();

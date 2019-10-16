@@ -80,39 +80,49 @@ input[type=button] {
 </style>
 </head>
 <body>
-	<div style="margin:5px 20px;">
-		<table width="100%">
-			<tr>
-				<td width="50%">配置文件所在路径：<span class="path">${path }</span></td>
-				<td align="right" style="padding-right:10px;">
-					<span id="tip"></span>
-					<input style="margin-left:10px;" type="button" id="btnSave" value="保存 Ctrl+S" />
-					<input type="button" id="btnImpExcel" value="导入Excel" />
-				</td>
-			</tr>
-		</table>
-	</div>
-	<div class="warning">
-		注：修改该文件即可通过 <a target="_blank" 
-					href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() +  "/report/id/"+ request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf(".")) +"/xxx" %>'> 
-					<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/report/id/"+request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf("."))+"/xxx" %>
-					</a> 访问对应接口，xxx是report节点id的值
-	</div>
-	<textarea id="code" name="code">${c}</textarea>
-	<div class="footer">
-		<input type="hidden" id="time" value="${time}" />
-		<input type="hidden" id="file" value="${file}" />
-		<input style="margin-left:10px;" type="button" id="btnCache" value="清空缓存" />		
-	</div>
+<sn:choose>
+	<sn:when test="${code>0}">
+		错误！<div style="font-size:16px;color:red">${file} ${c }</div>
+	</sn:when>
+	<sn:else>
+		<div style="margin:5px 20px;">
+				<table width="100%">
+					<tr>
+						<td width="50%">配置文件所在路径：<span class="path">${path }</span></td>
+						<td align="right" style="padding-right:10px;">
+							<span id="tip"></span>
+							<input style="margin-left:10px;" type="button" id="btnSave" value="保存 Ctrl+S" />
+							<input type="button" id="btnImpExcel" value="导入Excel" />
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="warning">
+				注：修改该文件即可通过 <a target="_blank" 
+							href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() +  "/report/id/"+ request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf(".")) +"/xxx" %>'> 
+							<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/report/id/"+request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf("."))+"/xxx" %>
+							</a> 访问对应接口，xxx是report节点id的值
+			</div>
+			<textarea id="code" name="code">${c}</textarea>
+			<div class="footer">
+				<input type="hidden" id="time" value="${time}" />
+				<input type="hidden" id="file" value="${file}" />
+				<input style="margin-left:10px;" type="button" id="btnCache" value="清空缓存" />		
+			</div>
+	</sn:else>
+</sn:choose>
 	<script type="text/javascript">
 		var dss = "${ds}".split(",");
 		var tags = {
-			"!reports" : [ "reports" ],
+			"!reports" : [ "reports","apis" ],
 			"!attrs" : {
 				ds : dss
 			},
 			reports : {
 				children : [ "report" ]
+			},
+			apis:{
+				children : [ "api" ]
 			},
 			report : {
 				attrs : {
@@ -122,14 +132,24 @@ input[type=button] {
 					cache:["false","true"],
 					ds : dss,
 					startDate : null,
+					auth:["false","true"],
 					endDate : null,
 					java : null,
+					type:null,
 					"java-align-data":["true","false"],
 					step : [ "month", "day", "year", "week" ],
 					dateFormat : [ "yyyyMM", "yyyy-MM", "yyyy-MM-dd",
 							"yyyyMMdd", "yyyy/MM/dd", "yyyy/MM" ]
 				},
 				children : [ "row" ]
+			},
+			api :{
+				attrs : {
+					id : null,
+					title : null,
+					auth:["false","true"],
+					lang:["js","java"]
+				}
 			},
 			row : {
 				attrs : {

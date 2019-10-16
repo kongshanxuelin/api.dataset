@@ -1,30 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<reports ds="default">			
-	<report id="TestIndex" title="测试返回类型map" type="map">
-		<row id="aaa" label="指标1">
-			select count(*) num from test_city
-		</row>
-		<row id="bbb" label="指标2">
-			select * from test_city limit 0,1
-		</row>
-	</report>
-	
-	<report id="reportJava" title="//dd" java="com.sumslack.dataset.api.report.impl.ReportTest" />
-  
-  
-  	<report id="testJS" title="测试JS数据集" type="map" startDate="2019-08-05" endDate="2019-08-12" step="day" java-align-data="true" dateFormat="yyyy-MM-dd">
-		<row id="jstest" label="测试测试" lang="js" field-field="dt" field-v="num">
-			return Db.use().query("select date_format(dt,'%Y-%m-%d') dt,temp num from test_city_temp where city=?",1);
-		</row>
-      <row id="jstest222" label="测试测试222" lang="js" field-field="dt" field-v="num">
-			return Db.use().query("select date_format(dt,'%Y-%m-%d') dt,temp num from test_city_temp where city=?",2);
-		</row>
-	</report>
-  
-    
-  	<report id="testJS2" title="" type="int">
-		<row id="abc" label="测试测试" lang="js">
-			return Db.use().del("t_test",{id:1});
-		</row>
-	</report>
-</reports>
+<xml>
+	<reports ds="default">			
+		<report id="TestIndex" title="测试返回类型map" type="map">
+			<row id="aaa" label="指标1">
+				select count(*) num from test_city
+			</row>
+			<row id="bbb" label="指标2">
+				select * from test_city limit 0,1
+			</row>
+		</report>
+		
+		<report id="reportJava" title="//dd" java="com.sumslack.dataset.api.report.impl.ReportTest" />
+	  
+	  
+		<report id="testJS" title="测试JS数据集" auth="false" type="map" startDate="2019-08-05" endDate="2019-08-12" step="day" java-align-data="true" dateFormat="yyyy-MM-dd">
+			<row id="jstest" label="测试测试" lang="js" field-field="dt" field-v="num">
+				return Db.use().query("select date_format(dt,'%Y-%m-%d') dt,temp num from test_city_temp where city=?",1);
+			</row>
+		  <row id="jstest222" label="测试测试" lang="js" field-field="dt" field-v="num">
+				return Db.use().query("select date_format(dt,'%Y-%m-%d') dt,temp num from test_city_temp where city=?",2);
+			</row>
+		</report>
+		
+		<report id="testAuth" title="这个接口需要登录才能访问1" type="map" auth="true">
+			<row id="jstest" label="测试" lang="js">
+				return {a:1};
+			</row>
+		</report>
+	  
+		
+		<report id="testJS2" title="" type="int">
+			<row id="abc" label="测试测试" lang="js">
+				return Db.use().del("t_test",{id:1});
+			</row>
+		</report>
+	</reports>
+	<apis>
+		<api id="login" lang="js" title="登录1">
+			<![CDATA[			
+			logger.d("start login...");
+			var _user = Db.use().one("select id,user_name from user where user_name = ? and password = ?",params.username,params.password);
+			if(_user!=null){
+				logger.d("userid:"+_user.id);
+				var _token = Auth.genToken();
+				logger.d("_token:"+_token);
+				var userBean = {userid:_user.id,username:_user.user_name,token:_token};
+				var res = Auth.storeToken(_token,userBean);
+				logger.d("res:"+res);
+				if(res){
+					return {code:0,msg:"login ok.",user:userBean};
+				}else{
+					return {code:500,msg:"login failed."};
+				}
+			}
+			return {code:404,msg:"用户名密码错误."};
+			]]>
+		</api>
+		<api id="logout" lang="js" title="登出">
+			Auth.logout("${token}","${userid}");
+			return "logout ok";
+		</api>
+      <api id="array" lang="js" auth="true" title="返回一个json数组">
+			return [{a:1},{a:2}];
+		</api>
+	</apis>
+</xml>

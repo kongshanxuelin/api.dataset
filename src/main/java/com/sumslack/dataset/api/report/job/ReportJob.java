@@ -13,8 +13,10 @@ import com.sumscope.tag.util.StrUtil;
 import com.sumslack.dataset.api.report.util.ReportUtil;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.watch.SimpleWatcher;
 import cn.hutool.core.io.watch.WatchMonitor;
 import cn.hutool.core.io.watch.Watcher;
+import cn.hutool.core.io.watch.watchers.DelayWatcher;
 
 public class ReportJob extends TagJob{
 	//配置文件所在目录
@@ -24,31 +26,41 @@ public class ReportJob extends TagJob{
 		//首次初始化配置
 		ReportUtil.initReports("all");
 		File file = FileUtil.file(REPORT_FILEPATH);
-		WatchMonitor watchMonitor = WatchMonitor.create(file, WatchMonitor.ENTRY_MODIFY);
-		watchMonitor.setWatcher(new Watcher(){
-		    @Override
-		    public void onCreate(WatchEvent<?> event, Path currentPath) {
-		        Object obj = event.context();
-		    }
-
-		    @Override
-		    public void onModify(WatchEvent<?> event, Path currentPath) {
-		        Object obj = event.context();
-		        //修改文件了需要更新缓存
-		        ReportUtil.initReports(currentPath.getFileName().toString());
-		    }
-
-		    @Override
-		    public void onDelete(WatchEvent<?> event, Path currentPath) {
-		        Object obj = event.context();
-		    }
-
-		    @Override
-		    public void onOverflow(WatchEvent<?> event, Path currentPath) {
-		        Object obj = event.context();
-		    }
-		});
-		watchMonitor.setMaxDepth(3);
-		watchMonitor.start();
+		WatchMonitor.createAll(file, new DelayWatcher(new SimpleWatcher() {
+			@Override
+			public void onModify(WatchEvent<?> event, Path currentPath) {
+				System.out.println("event:" + event.toString());
+				if(event.kind() == WatchMonitor.ENTRY_MODIFY) {
+					ReportUtil.initReports("all");
+				}
+			}
+		}, 2000)).start();
+		
+//		WatchMonitor watchMonitor = WatchMonitor.create(file, WatchMonitor.ENTRY_MODIFY);
+//		watchMonitor.setWatcher(new Watcher(){
+//		    @Override
+//		    public void onCreate(WatchEvent<?> event, Path currentPath) {
+//		        Object obj = event.context();
+//		    }
+//
+//		    @Override
+//		    public void onModify(WatchEvent<?> event, Path currentPath) {
+//		        Object obj = event.context();
+//		        //修改文件了需要更新缓存
+//		        ReportUtil.initReports(currentPath.getFileName().toString());
+//		    }
+//
+//		    @Override
+//		    public void onDelete(WatchEvent<?> event, Path currentPath) {
+//		        Object obj = event.context();
+//		    }
+//
+//		    @Override
+//		    public void onOverflow(WatchEvent<?> event, Path currentPath) {
+//		        Object obj = event.context();
+//		    }
+//		});
+//		watchMonitor.setMaxDepth(3);
+//		watchMonitor.start();
 	}
 }

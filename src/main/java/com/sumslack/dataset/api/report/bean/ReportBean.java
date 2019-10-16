@@ -34,6 +34,7 @@ public class ReportBean implements Serializable{
 	private String step;
 	private String dateFormat;
 	private String java;
+	private boolean isAuth =false;//该接口是否需要登录认证才能访问
 	//指定返回的数据类型，默认为：{cols:[...],rows:[...]}的形式，如果指定为map，则一个report代码一个key
 	private String type; 
 	//是否使用java对齐多个数据集中的数据
@@ -108,6 +109,13 @@ public class ReportBean implements Serializable{
 	}
 	public void setJava(String java) {
 		this.java = java;
+	}
+	
+	public boolean isAuth() {
+		return isAuth;
+	}
+	public void setAuth(boolean isAuth) {
+		this.isAuth = isAuth;
 	}
 	public void init(Map paramMap) {
 		for(ReportLineBean rlb : this.lines) {

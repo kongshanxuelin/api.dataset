@@ -1,19 +1,24 @@
 package com.sumslack.js;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.compress.utils.Lists;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.sumscope.tag.TagConst;
 
 import cn.hutool.db.DbUtil;
 import cn.hutool.db.Entity;
 import cn.hutool.db.Page;
 import cn.hutool.db.PageResult;
-
-import jdk.nashorn.api.scripting.*;
-
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
+@JSFunc(id="Db",description = "数据库操作类")
 public class Db {
 	private DataSource ds = TagConst.dataSourceMap.get("default").getDataSource();;
 	public Db use(String datasource) {
@@ -40,6 +45,42 @@ public class Db {
 		}
 		return null;
 	}
+	
+	public JSONObject one(String sql,Object... params) {
+		try {
+			Map result = new HashMap();
+			Entity rec = DbUtil.use(this.ds).queryOne(sql, params);
+			if(rec!=null) {
+				for(String k : rec.keySet()) {
+					result.put(k, rec.get(k));
+				}
+			}
+			return new JSONObject(result);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public JSONArray list(String sql,Object... params) {
+		try {
+			List<Entity> rec = DbUtil.use(this.ds).query(sql, params);
+			if(rec!=null) {
+				List result = Lists.newArrayList();
+				for(Entity en : rec) {
+					Map _map = new HashMap();
+					for(String k : en.keySet()) {
+						_map.put(k, en.get(k));
+					}
+					result.add(_map);
+				}
+				return new JSONArray(result);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public PageResult<Entity> page(String tableName,Object where,int pageNumber,int pageSize) {
 		try {
 			Entity whereEntity =  entityIt(tableName,where);
