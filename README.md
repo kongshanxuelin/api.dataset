@@ -1,11 +1,12 @@
 [![QQ](http://pub.idqqimg.com/wpa/images/group.png)](https://jq.qq.com/?_wv=1027&k=5HWgxBZ)
 
-获取数据集通用API
+极速编写后台API
 ===================
 
 欢迎加入QQ群讨论（群号：604844003）
 
-在我们开发某些业务应用时，只需要获取数据集即可，比如报表系统，大屏展现等，那么我们可以设计一个简单的接口，用来获取数据，通过一个配置文件配置好我们的接口，这样在调试前端程序时，我们可以无需关注后台代码，也无需重启的情况下调试各个Rest接口：
+以一种全新的方式编写后台API，你可以通过`Java`或`JS`语言极速的编写后台API，通过自动生成的配置文件，在该配置文件中新增api或report节点来创建动态API，我们封装了大量的后台js类供配置文件使用，
+这样在调试前端程序时，我们可以**无需关注后台代码**，也**无需重启**的情况下调试各个Rest接口。
 
 【2019-10-16】 v1.0.1
 - 新增多个xml配置
@@ -28,44 +29,17 @@ v1.0.0
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
+<xml>
 <reports ds="default">
-	<report id="avgTemp" title="计算城市平均温度" java-align-data="true" ds="default" startDate="${date}" endDate="2019-09-01" step="month" dateFormat="yyyyMM">
-		<row label="测试数据1 " align="right" fontWeight="bold">
-			<![CDATA[
-				{call testRetSelect('${date}')}
-			]]>
-		</row>
-		<row label="测试数据2" align="right" fontWeight="bold">
-			<![CDATA[			
-				select city field,avg(temp) v 
-				from test_city_temp
-				where dt>='${date}'
-				group by city;
-			]]>
-		</row>
-	</report>
-	<report id="testWeek" title="测试动态列周" ds="default" startDate="2019-08-27" endDate="2019-09-01" step="day" dateFormat="yyyyMMdd">
-		<row label="test " align="right" fontWeight="bold">
-			<![CDATA[
-				{call testRetSelect('${date}')}
-			]]>
-		</row>
-	</report>
-	<report id="testJavaAlignData" title="测试后台对齐数据" java-align-data="true" ds="default" startDate="2019-08-07" endDate="2019-08-09" step="day" dateFormat="yyyyMMdd">
-		<row label="d1">
-			<![CDATA[
-				select DATE_FORMAT(dt,'%Y%m%d') field,temp v from test_city_temp where city = 1
-			]]>
-		</row>
-		<row label="d2">
-			<![CDATA[
-				select DATE_FORMAT(dt,'%Y%m%d') field,temp v from test_city_temp where city = 8
-			]]>
-		</row>
-	</report>
-	
-				
-	<report id="TestIndex" title="首页指标结果">
+	<report id="testJS" title="根据日期自动groupby" type="map" startDate="2019-08-05" endDate="2019-08-12" step="day" java-align-data="true" dateFormat="yyyy-MM-dd">
+			<row id="jstest" label="测试测试" lang="js" field-field="dt" field-v="num">
+				return Db.use().query("select date_format(dt,'%Y-%m-%d') dt,temp num from test_city_temp where city=?",1);
+			</row>
+		  <row id="jstest222" label="测试测试" lang="js" field-field="dt" field-v="num">
+				return Db.use().query("select date_format(dt,'%Y-%m-%d') dt,temp num from test_city_temp where city=?",2);
+			</row>
+	</report>				
+	<report id="TestIndex" title="多个数据集数据会自动合并">
 		<row id="aaa" label="总有效用户数">
 			select count(*) num from test_city
 		</row>
@@ -74,6 +48,33 @@ v1.0.0
 		</row>
 	</report>
 	
-	<report id="reportJava" java="com.sumslack.dataset.api.report.impl.ReportTest" />
+	<report id="reportJava" title="Java类编写业务" java="com.sumslack.dataset.api.report.impl.ReportTest" />
 </reports>
+<apis>
+		<api id="login" lang="js" title="登录接口">
+			<![CDATA[			
+			logger.d("start login...");
+			var _user = Db.use().one("select id,user_name from user where user_name = ? and password = ?",params.username,params.password);
+			if(_user!=null){
+				var _token = Auth.genToken();
+				var userBean = {userid:_user.id,username:_user.user_name,token:_token};
+				var res = Auth.storeToken(_token,userBean);
+				if(res){
+					return {code:0,msg:"login ok.",user:userBean};
+				}else{
+					return {code:500,msg:"login failed."};
+				}
+			}
+			return {code:404,msg:"用户名密码错误."};
+			]]>
+		</api>
+		<api id="logout" lang="js" title="登出接口">
+			Auth.logout("${token}","${userid}");
+			return "logout ok";
+		</api>
+      <api id="array" lang="js" auth="true" title="需要验证的测试接口">
+			return [{a:1},{a:2}];
+		</api>
+</apis>
+</xml>
 ```
