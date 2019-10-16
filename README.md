@@ -30,14 +30,14 @@ v1.0.0
 ```html
 <?xml version="1.0" encoding="UTF-8"?>
 <xml>
-  	<datasources>
+<datasources>
     <datasource name="test">
       	 <property name="driver" value="com.mysql.jdbc.Driver" />
 		  <property name="url" value="jdbc:mysql://[IP]:[PORT]/[DATABASE_NAME]?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true" />
 		  <property name="user" value="xxxxx" />
 		  <property name="password" value="xxxxx" />
     </datasource>
-  </datasources>
+</datasources>
 <reports ds="default">
 	<report id="testJS" title="根据日期自动groupby" type="map" startDate="2019-08-05" endDate="2019-08-12" step="day" java-align-data="true" dateFormat="yyyy-MM-dd">
 			<row id="jstest" label="测试测试" lang="js" field-field="dt" field-v="num">
