@@ -27,7 +27,7 @@ v1.0.0
 
 一个demo的xml文件：
 
-```
+```html
 <?xml version="1.0" encoding="UTF-8"?>
 <xml>
   	<datasources>
