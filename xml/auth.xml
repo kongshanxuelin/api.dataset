@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xml>
+  	<datasources>
+    <datasource name="test">
+      	 <property name="driver" value="com.mysql.jdbc.Driver" />
+		  <property name="url" value="jdbc:mysql://192.168.1.215:3306/prd_sumscopecontract?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true" />
+		  <property name="user" value="dev" />
+		  <property name="password" value="123456" />
+    </datasource>
+  </datasources>
 	<reports ds="default">			
 		<report id="TestIndex" title="测试返回类型map" type="map">
 			<row id="aaa" label="指标1">
@@ -39,7 +47,7 @@
 		<api id="login" lang="js" title="登录1">
 			<![CDATA[			
 			logger.d("start login...");
-			var _user = Db.use().one("select id,user_name from user where user_name = ? and password = ?",params.username,params.password);
+			var _user = Db.one("select id,user_name from user where user_name = ? and password = ?",params.username,params.password);
 			if(_user!=null){
 				logger.d("userid:"+_user.id);
 				var _token = Auth.genToken();
@@ -62,6 +70,9 @@
 		</api>
       <api id="array" lang="js" auth="true" title="返回一个json数组">
 			return [{a:1},{a:2}];
+		</api>
+      <api id="testds" lang="js" ds="test" title="测试自定义数据源">
+			return Db.list("select * from base_user where uid>?",0);
 		</api>
 	</apis>
 </xml>
