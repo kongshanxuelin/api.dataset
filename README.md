@@ -59,30 +59,30 @@ v1.0.0
 	<report id="reportJava" title="Java类编写业务" java="com.sumslack.dataset.api.report.impl.ReportTest" />
 </reports>
 <apis>
-		<api id="login" lang="js" title="登录接口">
-			<![CDATA[			
-			logger.d("start login...");
-			var _user = Db.use().one("select id,user_name from user where user_name = ? and password = ?",params.username,params.password);
-			if(_user!=null){
-				var _token = Auth.genToken();
-				var userBean = {userid:_user.id,username:_user.user_name,token:_token};
-				var res = Auth.storeToken(_token,userBean);
-				if(res){
-					return {code:0,msg:"login ok.",user:userBean};
-				}else{
-					return {code:500,msg:"login failed."};
-				}
+	<api id="login" lang="js" title="登录接口">
+		<![CDATA[			
+		logger.d("start login...");
+		var _user = Db.use().one("select id,user_name from user where user_name = ? and password = ?",params.username,params.password);
+		if(_user!=null){
+			var _token = Auth.genToken();
+			var userBean = {userid:_user.id,username:_user.user_name,token:_token};
+			var res = Auth.storeToken(_token,userBean);
+			if(res){
+				return {code:0,msg:"login ok.",user:userBean};
+			}else{
+				return {code:500,msg:"login failed."};
 			}
-			return {code:404,msg:"用户名密码错误."};
-			]]>
-		</api>
-		<api id="logout" lang="js" title="登出接口">
-			Auth.logout("${token}","${userid}");
-			return "logout ok";
-		</api>
-      <api id="array" lang="js" auth="true" title="需要验证的测试接口">
-			return [{a:1},{a:2}];
-		</api>
+		}
+		return {code:404,msg:"用户名密码错误."};
+		]]>
+	</api>
+	<api id="logout" lang="js" title="登出接口">
+		Auth.logout("${token}","${userid}");
+		return "logout ok";
+	</api>
+  <api id="array" lang="js" auth="true" title="需要验证的测试接口">
+		return [{a:1},{a:2}];
+	</api>
 </apis>
 </xml>
 ```
