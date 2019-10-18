@@ -7,16 +7,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.compress.utils.Lists;
-
+import com.alibaba.fastjson.JSON;
 import com.sumscope.tag.TagConst;
 import com.sumscope.tag.rest.annotation.Post;
 import com.sumscope.tag.rest.annotation.URIAlias;
 import com.sumscope.tag.rest.servlet.BaseController;
+import com.sumscope.tag.util.HttpUtils;
 import com.sumscope.tag.util.StrUtil;
+import com.sumslack.dataset.api.report.bean.ApiBean;
 import com.sumslack.dataset.api.report.bean.ReportLineBean;
 import com.sumslack.dataset.api.report.job.ReportJob;
 import com.sumslack.dataset.api.report.util.ReportUtil;
+import com.sumslack.dataset.api.report.vo.ReportVO;
+import com.sumslack.excel.JSUtil;
 import com.sumslack.excel.R;
 
 import cn.hutool.core.collection.CollectionUtil;
@@ -25,6 +28,37 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ReUtil;
 @URIAlias(value = "/")
 public class ReportController extends BaseController{
+	@URIAlias(value = "run/*")
+	public String run() throws Exception {
+		String fileName = StrUtil.formatNullStr(request.getAttribute("$1"),"report")  + ".xml";
+		request.setAttribute("file",fileName);
+		return "/run.jsp";
+	}
+	
+	@URIAlias(value = "ws")
+	public String ws(String name,String msg) throws Exception {
+		ReportJob.broadcastLog(name, msg);
+		return "push test";
+	}
+	
+	@Post
+	@URIAlias(value = "runcode")
+	public Map runPreview(String content,String lang,String file) {
+		Map retMap = new HashMap();
+		ApiBean apiBean = new ApiBean();
+		apiBean.setId("test");
+		apiBean.setLang(StrUtil.formatNullStr(lang,"js"));
+		apiBean.setContent(content);
+		apiBean.setAuth(false);
+		apiBean.setTitle("test");
+		Object ret = JSUtil.execRetApi(file,apiBean,"(function(){"+content+"})()",getParamMap());
+		if(ret instanceof String) {
+			retMap.put("ret", ret.toString());
+		}else {
+			retMap.put("ret", JSON.toJSONString(ret));
+		}
+		return retMap;
+	}
 	
 	@URIAlias(value = "home/*")
 	public String view() throws Exception {

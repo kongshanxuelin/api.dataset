@@ -9,8 +9,10 @@
 这样在调试前端程序时，我们可以**无需关注后台代码**，也**无需重启**的情况下调试各个Rest接口。
 
 v1.0.2
-- 可以通过`cloud.get/post/delete/put`接口调用Sumslack开放平台云API
-
+- 可以通过`cloud.get/post/delete/put`接口调用Sumslack开放平台云API；
+- 通过logger在线调测接口给出更多的错误提示，方便在线调测接口；
+- 新增在线接口调测功能；
+- 整合websocket增加web推送功能；
 
 【2019-10-16】 v1.0.1
 - 新增多个xml配置

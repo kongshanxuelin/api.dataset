@@ -91,6 +91,12 @@
 		  <artifactId>cloud-common</artifactId>
 		  <version>1.0.0</version>
 		</dependency>
+		<!-- socket.io -->
+		<dependency>
+		    <groupId>com.corundumstudio.socketio</groupId>
+		    <artifactId>netty-socketio</artifactId>
+		    <version>1.7.17</version>
+		</dependency>
 		
   </dependencies>
   <repositories>

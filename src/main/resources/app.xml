@@ -33,7 +33,7 @@
 		
 		
 		<!-- 如果需要使用WebSocket标签，以下配置是必须的 -->
-		<item name="websocket.server.enable" value="false"/>																				<!-- 是否启用WebSocket服务器，Websocket服务可以独立部署 -->
+		<item name="websocket.server.enable" value="true"/>																				<!-- 是否启用WebSocket服务器，Websocket服务可以独立部署 -->
 		<item name="websocket.server.port" value="8888"/>																				<!-- WebSocket bind端口，与js侦听的端口配对 -->
 		<item name="websocket.client.enable" value="true"/>																				<!-- 是否启用WebSocket客户端，用于Java程序Push消息到前端 -->
 		<item name="websocket.client.ip" value="localhost"/>																			<!-- WebSocket Server侦听的IP -->

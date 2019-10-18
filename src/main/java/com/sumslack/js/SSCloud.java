@@ -5,7 +5,7 @@ import java.util.Map;
 import com.alibaba.fastjson.JSONObject;
 import com.sumslack.common.api.ApiManager;
 
-@JSFunc(id="cloud",description = "新增调用sumslack云平台接口服务")
+@JSFunc(id="Cloud",description = "新增调用sumslack云平台接口服务")
 public class SSCloud {
 	public JSONObject post(String appId,String appSec,String apiUrl,Map<String,String> params) {
 		JSONObject ret = new JSONObject();

@@ -129,8 +129,13 @@ public class JSUtil extends ScriptUtil {
             engine.put("params", paramMap);
             //如果被调用的api节点指定的数据源，则使用该数据源
             if(ReportUtil.getDatasourceCache(fileName)!=null) {
-            	Optional<DatasourceBean> _dsBean = ReportUtil.getDatasourceCache(fileName).stream().filter(s -> s.getName().equals(api.getDs())).findFirst();
-            	engine.put("Db",new Db().use(_dsBean.isPresent()?_dsBean.get():null));
+            	if(!StrUtil.isEmpty(api.getDs())) {
+                	Optional<DatasourceBean> _dsBean = ReportUtil.getDatasourceCache(fileName).stream().filter(s -> s.getName().equals(api.getDs())).findFirst();
+                	engine.put("Db",new Db().use(_dsBean.isPresent()?_dsBean.get():null));
+            	}else {
+                	Optional<DatasourceBean> _dsBean = ReportUtil.getDatasourceCache(fileName).stream().findFirst();
+                	engine.put("Db",new Db().use(_dsBean.isPresent()?_dsBean.get():null));            		
+            	}
             }
             Object obj = engine.eval(script);
             if(obj instanceof ScriptObjectMirror) {
@@ -149,8 +154,8 @@ public class JSUtil extends ScriptUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return "ERROR:" + e.getMessage();
         }
-        return null;
     }
 
     public static boolean isDate(String strDate) {

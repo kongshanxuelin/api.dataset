@@ -62,6 +62,7 @@ public class ReportUtil {
 	
 	
 	private static void initReportFileName(String fileName) {
+		System.out.println("##############正在缓存：" + fileName);
 		Document doc = XmlUtil.readXML(ReportJob.REPORT_FILEPATH + fileName);
 		Element rootElement = XmlUtil.getRootElement(doc);
 		Element reportsElement = XmlUtil.getElement(rootElement, "reports");

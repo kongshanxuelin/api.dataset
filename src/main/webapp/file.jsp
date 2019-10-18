@@ -2,6 +2,8 @@
 <%@ taglib prefix="sn" uri="http://www.sumscope.com/taglib"%>
 <html>
 <head>
+<!-- bootstrap -->
+<link rel="stylesheet" href="<sn:webroot/>/css/bootstrap.min.css">
 <script type="text/javascript"
 	src="<sn:webroot/>/js/jquery-1.11.1.min.js"></script>
 <link rel="stylesheet" href="<sn:webroot/>/js/codemirror.css">
@@ -42,29 +44,14 @@ li {
 	color: #155724;
     background-color: #d4edda;
     border-color: #c3e6cb;
-    padding: .75rem 1.25rem;
-    margin-bottom: 1rem;
     border: 1px solid transparent;
     border-radius: .25rem;
+    margin:0;padding:0;
 }
 #tip {
 	font-size:12px;
 	color: #155724;
 	margin-left:10px;
-}
-input[type=button] {
-    display: inline-block;
-    font-weight: 400;
-    color: #212529;
-    background-color: #ffc107;
-    border-color: #ffc107;
-        border: 1px solid transparent;
-    padding: .175rem .35rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: .25rem;
-        user-select: none;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 .footer {
 	text-align:right;
@@ -91,14 +78,15 @@ input[type=button] {
 						<td width="50%">配置文件所在路径：<span class="path">${path }</span></td>
 						<td align="right" style="padding-right:10px;">
 							<span id="tip"></span>
-							<input style="margin-left:10px;" type="button" id="btnSave" value="保存 Ctrl+S" />
-							<input type="button" id="btnImpExcel" value="导入Excel" />
+							<input class="btn btn-primary" type="button" id="btnSave" value="保存 Ctrl+S" />
+							<input class="btn btn-secondary" type="button" id="btnImpExcel" value="导入Excel" />
+							<a class="btn btn-dark" href="<sn:webroot/>/report/run/${file.replaceAll('.xml','')}" target="_blank">调测脚本</a>
 						</td>
 					</tr>
 				</table>
 			</div>
 			<div class="warning">
-				<ul>
+				<ul >
 					<li>数据集report节点可通过 <a target="_blank" 
 							href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() +  "/report/id/"+ request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf(".")) +"/xxx" %>'> 
 							<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/report/id/"+request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf("."))+"/xxx" %>
@@ -109,11 +97,11 @@ input[type=button] {
 							</a> 访问，xxx是api节点id的值</li>
 				</ul>
 			</div>
-			<textarea id="code" name="code">${c}</textarea>
+			<textarea id="code" name="code">${c.replaceAll("&","&amp;")}</textarea>
 			<div class="footer">
 				<input type="hidden" id="time" value="${time}" />
 				<input type="hidden" id="file" value="${file}" />
-				<input style="margin-left:10px;" type="button" id="btnCache" value="清空数据缓存" />		
+				<input class="btn btn-link" type="button" id="btnCache" value="清空数据缓存" />		
 			</div>
 	</sn:else>
 </sn:choose>
