@@ -8,6 +8,10 @@
 以一种全新的方式编写后台API，你可以通过`Java`或`JS`语言极速的编写后台API，通过自动生成的配置文件，在该配置文件中新增api或report节点来创建动态API，我们封装了大量的后台js类供配置文件使用，
 这样在调试前端程序时，我们可以**无需关注后台代码**，也**无需重启**的情况下调试各个Rest接口。
 
+v1.0.2
+- 可以通过`cloud.get/post/delete/put`接口调用Sumslack开放平台云API
+
+
 【2019-10-16】 v1.0.1
 - 新增多个xml配置
 - 增加apis节点，支持通过js编写api；
@@ -21,7 +25,7 @@ v1.0.0
 - 支持groupby操作；
 - 修改配置，增加API接口无需重启服务，实时生效；
 - js函数库支持数据库CRUD操作；
-- 内含Excel通用导入程序，导入的Excel可编写API对外提供接口获取数据；
+- 内含Excel通用导入程序，Excel通过加入一个定义Sheet可将任意Excel导入到数据库中；
 
 <img src='http://h5.sumslack.com/1212.png'  alt='preview' />
 

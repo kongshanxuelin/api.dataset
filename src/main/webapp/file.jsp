@@ -98,16 +98,22 @@ input[type=button] {
 				</table>
 			</div>
 			<div class="warning">
-				注：修改该文件即可通过 <a target="_blank" 
+				<ul>
+					<li>数据集report节点可通过 <a target="_blank" 
 							href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() +  "/report/id/"+ request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf(".")) +"/xxx" %>'> 
 							<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/report/id/"+request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf("."))+"/xxx" %>
-							</a> 访问对应接口，xxx是report节点id的值
+							</a> 访问，xxx是report节点id的值</li>
+					<li>接口api可通过 <a target="_blank" 
+							href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() +  "/api/id/"+ request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf(".")) +"/xxx" %>'> 
+							<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/api/id/"+request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf("."))+"/xxx" %>
+							</a> 访问，xxx是api节点id的值</li>
+				</ul>
 			</div>
 			<textarea id="code" name="code">${c}</textarea>
 			<div class="footer">
 				<input type="hidden" id="time" value="${time}" />
 				<input type="hidden" id="file" value="${file}" />
-				<input style="margin-left:10px;" type="button" id="btnCache" value="清空缓存" />		
+				<input style="margin-left:10px;" type="button" id="btnCache" value="清空数据缓存" />		
 			</div>
 	</sn:else>
 </sn:choose>
