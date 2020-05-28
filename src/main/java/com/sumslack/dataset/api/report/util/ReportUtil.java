@@ -106,6 +106,10 @@ public class ReportUtil {
 					apiBean.setAuth(StrUtil.formatNullStr(api.getAttribute("auth"),"false").equals("true"));
 					apiBean.setLang(StrUtil.formatNullStr(api.getAttribute("lang"),"js"));
 					apiBean.setType(StrUtil.formatNullStr(api.getAttribute("type")));
+					apiBean.setUiField(StrUtil.formatNullStr(api.getAttribute("ui-field")));
+					apiBean.setUiTitle(StrUtil.formatNullStr(api.getAttribute("ui-title")));
+					apiBean.setUiHeader(Convert.toStr(api.getAttribute("ui-header"),""));
+					apiBean.setUiFooter(Convert.toStr(api.getAttribute("ui-footer"),""));
 					apiBean.setContent(getCDData(api));
 //					Map<String,DataSource> datasources = new HashMap();
 //					if(datasourcesElement!=null) {

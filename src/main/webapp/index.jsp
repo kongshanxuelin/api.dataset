@@ -6,7 +6,7 @@
 <body>
 <%
 response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);   
-response.setHeader("Location","/report/home");   
- %>   
+response.setHeader("Location",request.getContextPath() + "/report/home/test");   
+%>   
 </body>
 </html>

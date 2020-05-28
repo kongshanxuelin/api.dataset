@@ -17,6 +17,12 @@ public class ApiBean implements Serializable{
 	private String lang="js";
 	private String content;
 	private String ds = "default";
+	
+	private String uiField;
+	private String uiTitle;
+	private String uiHeader;
+	private String uiFooter;
+	
 	public String getDs() {
 		return ds;
 	}
@@ -67,6 +73,32 @@ public class ApiBean implements Serializable{
 	}
 	public void setResult(Object result) {
 		this.result = result;
+	}
+	
+	public String getUiField() {
+		return uiField;
+	}
+	public void setUiField(String uiField) {
+		this.uiField = uiField;
+	}
+	public String getUiTitle() {
+		return uiTitle;
+	}
+	public void setUiTitle(String uiTitle) {
+		this.uiTitle = uiTitle;
+	}
+	
+	public String getUiHeader() {
+		return uiHeader;
+	}
+	public void setUiHeader(String uiHeader) {
+		this.uiHeader = uiHeader;
+	}
+	public String getUiFooter() {
+		return uiFooter;
+	}
+	public void setUiFooter(String uiFooter) {
+		this.uiFooter = uiFooter;
 	}
 	public Object invokeJavascript(String fileName,ApiBean api,Map paramMap) throws Exception{
 		if(!StrUtil.isEmpty(this.content)) {

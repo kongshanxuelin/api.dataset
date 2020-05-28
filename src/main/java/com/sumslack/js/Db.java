@@ -73,6 +73,24 @@ public class Db {
 		}
 		return null;
 	}
+	
+	public Object call(String func,Object... params) {
+		try {
+			String ss = "";
+			if(params!=null && params.length>0) {
+				for(int i=0;i<params.length;i++) {
+					ss += ",?";
+				}
+				ss = ss.substring(1,ss.length());
+			}
+			Object result = DbUtil.use(this.ds).query("{call "+func+"("+ss+")}", params);
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public JSONArray list(String sql,Object... params) {
 		try {
 			List<Entity> rec = DbUtil.use(this.ds).query(sql, params);
