@@ -19,15 +19,16 @@
 </head>
 <body>
 	<div class="header">
-		
+		${uiHeader }
 	</div>
 	<div id="${fileName}_${apiId}">
 	</div>
 	<div class="footer">
-		
+		${uiFooter }
 	</div>
 	<script type="text/javascript">
 		var id = "${fileName}_${apiId}";
+		var table = null;
 		$(function(){
 			$.get("<sn:webroot />/report/ui",{apiId:"${apiId}",fileName:"${fileName}"},function(result){
 				console.log(result.fields.length);
@@ -43,7 +44,7 @@
 						_columns.push({title:titles[i], field:fields[i],hozAlign:"left"});
 					});
 
-					var table = new Tabulator("#"+id, {
+					table = new Tabulator("#"+id, {
 						columnHeaderHozAlign:"center",
 						cellHozAlign:"center",
 						cellVertAlign:"middle",
@@ -53,12 +54,12 @@
 					});
 					table.setData(result.result);
 					
-					$(".header").html(result.header);
-					$(".footer").html(result.footer);
+					//start customize js loaded
+					${uiJs }
 				}
 			});
-
 		});
+		
 	</script>
 </body>
 </html>

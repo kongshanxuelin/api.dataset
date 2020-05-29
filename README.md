@@ -6,13 +6,14 @@
 欢迎加入QQ群讨论（群号：604844003）
 
 以一种全新的方式编写后台API，你可以通过`Java`或`JS`语言极速的编写后台API，通过自动生成的配置文件，在该配置文件中新增api或report节点来创建动态API，我们封装了大量的后台js类供配置文件使用，
-这样在调试前端程序时，我们可以**无需关注后台代码**，也**无需重启**的情况下调试各个Rest接口。
+这样在调试前端程序时，我们可以**无需关注后台代码**，也**无需重启**的情况下调试各个Rest接口，支持以表格形式展现接口数据。
 
-v1.0.3【2020-05-28】
-- 新增UI表格展现；
+`1分钟将想要的后台数据安全的展现在客户面前，代码是完全开放的一个小项目:)`
 
+v1.0.3【2020-05-29】
+ - 增加表格展现接口数据
+ 
 v1.0.2
-- 可以通过`cloud.get/post/delete/put`接口调用Sumslack开放平台云API；
 - 通过logger在线调测接口给出更多的错误提示，方便在线调测接口；
 - 新增在线接口调测功能；
 - 整合websocket增加web推送功能；
@@ -31,6 +32,8 @@ v1.0.0
 - 修改配置，增加API接口无需重启服务，实时生效；
 - js函数库支持数据库CRUD操作；
 - 内含Excel通用导入程序，Excel通过加入一个定义Sheet可将任意Excel导入到数据库中；
+
+<img src='http://h5.sumslack.com/report.png'  alt='preview' />
 
 <img src='http://h5.sumslack.com/1212.png'  alt='preview' />
 
@@ -89,12 +92,33 @@ v1.0.0
 		Auth.logout("${token}","${userid}");
 		return "logout ok";
 	</api>
-  	<api id="array" lang="js" auth="true" title="需要验证的测试接口">
+  	<api id="array" lang="js" auth="true" title="需要验证的测试接口" ui-field="a" ui-title="中文列明">
 		return [{a:1},{a:2}];
 	</api>
 	<api id="testds" lang="js" ds="test" title="测试自定义数据源">
 		return Db.list("select * from base_user where uid>?",0);
 	</api>
 </apis>
+<!--以下节点是可选的，接口需要直接UI表格展现才需要-->
+<uis>
+     <ui rel-api="array">
+       <header>
+         <![CDATA[   
+       		<div style="color:red;font-size:13px;text-align:right">表头内容</div>
+			]]>
+       </header>
+       <footer>
+          <![CDATA[   
+ 				<div style="color:grey;font-size:13px;text-align:right">表尾内容</div>
+			]]>
+       </footer>
+       <js>
+			<![CDATA[   
+			   //自定义代码，表格对象是table
+ 				console.log("hello world!");
+			]]>
+       </js>  
+     </ui>
+</uis>
 </xml>
 ```

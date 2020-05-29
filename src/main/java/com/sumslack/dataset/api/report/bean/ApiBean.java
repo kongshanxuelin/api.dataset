@@ -22,6 +22,7 @@ public class ApiBean implements Serializable{
 	private String uiTitle;
 	private String uiHeader;
 	private String uiFooter;
+	private String uiJS;
 	
 	public String getDs() {
 		return ds;
@@ -99,6 +100,13 @@ public class ApiBean implements Serializable{
 	}
 	public void setUiFooter(String uiFooter) {
 		this.uiFooter = uiFooter;
+	}
+	
+	public String getUiJS() {
+		return uiJS;
+	}
+	public void setUiJS(String uiJS) {
+		this.uiJS = uiJS;
 	}
 	public Object invokeJavascript(String fileName,ApiBean api,Map paramMap) throws Exception{
 		if(!StrUtil.isEmpty(this.content)) {

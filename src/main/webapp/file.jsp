@@ -108,7 +108,7 @@ li {
 	<script type="text/javascript">
 		var dss = "${ds}".split(",");
 		var tags = {
-			"!reports" : [ "reports","apis" ],
+			"!reports" : [ "reports","apis"],
 			"!attrs" : {
 				ds : dss
 			},
@@ -117,6 +117,9 @@ li {
 			},
 			apis:{
 				children : [ "api" ]
+			},
+			uis:{
+				children : [ "ui" ]
 			},
 			report : {
 				attrs : {
@@ -142,8 +145,16 @@ li {
 					id : null,
 					title : null,
 					auth:["false","true"],
-					lang:["js","java"]
+					lang:["js","java"],
+					"ui-field":null,
+					"ui-title":null
 				}
+			},
+			ui : {
+				attrs : {
+					"rel-api":null	
+				},
+				children : [ "header","footer","js" ]
 			},
 			row : {
 				attrs : {

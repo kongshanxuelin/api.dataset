@@ -67,6 +67,7 @@ public class ReportUtil {
 		Element rootElement = XmlUtil.getRootElement(doc);
 		Element reportsElement = XmlUtil.getElement(rootElement, "reports");
 		Element apisElement = XmlUtil.getElement(rootElement, "apis");
+		Element uisElement = XmlUtil.getElement(rootElement, "uis");
 		Element datasourcesElement = XmlUtil.getElement(rootElement, "datasources");
 		//数据源定义
 		if(datasourcesElement!=null) {
@@ -92,6 +93,7 @@ public class ReportUtil {
 				dsCache.put(fileName, dsBeanList);
 			}
 		}
+		
 		//API接口定义
 		if(apisElement!=null) {
 			List<Element> apiList = XmlUtil.getElements(apisElement, "api");
@@ -108,8 +110,10 @@ public class ReportUtil {
 					apiBean.setType(StrUtil.formatNullStr(api.getAttribute("type")));
 					apiBean.setUiField(StrUtil.formatNullStr(api.getAttribute("ui-field")));
 					apiBean.setUiTitle(StrUtil.formatNullStr(api.getAttribute("ui-title")));
-					apiBean.setUiHeader(Convert.toStr(api.getAttribute("ui-header"),""));
-					apiBean.setUiFooter(Convert.toStr(api.getAttribute("ui-footer"),""));
+					
+//					apiBean.setUiHeader(Convert.toStr(api.getAttribute("ui-header"),""));
+//					apiBean.setUiFooter(Convert.toStr(api.getAttribute("ui-footer"),""));
+					
 					apiBean.setContent(getCDData(api));
 //					Map<String,DataSource> datasources = new HashMap();
 //					if(datasourcesElement!=null) {
@@ -185,6 +189,28 @@ public class ReportUtil {
 				}
 			}
 			reportCache.put(fileName,reportList);
+		}
+		//UI定义
+		if(uisElement!=null) {
+			List<ApiBean> _apiList = apiCache.get(fileName);
+			if(_apiList!=null) {
+				List<Element> uiList = XmlUtil.getElements(uisElement, "ui");
+				for(Element ui : uiList) {
+					final String _apiId = StrUtil.formatNullStr(ui.getAttribute("rel-api"));
+					Optional<ApiBean> _apiBean = _apiList.stream().filter(s -> s.getId().equals(_apiId)).findFirst();
+					if(_apiBean.isPresent()) {
+						Element uiHeader = XmlUtil.getElement(ui,"header");
+						Element uiFooter = XmlUtil.getElement(ui,"footer");
+						Element uiJS = XmlUtil.getElement(ui,"js");
+						if(uiHeader!=null)
+							_apiBean.get().setUiHeader(getCDData(uiHeader));
+						if(uiFooter!=null)
+							_apiBean.get().setUiFooter(getCDData(uiFooter));
+						if(uiJS!=null)
+							_apiBean.get().setUiJS(getCDData(uiJS));
+					}
+				}
+			}
 		}
 	}
 	

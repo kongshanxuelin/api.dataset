@@ -117,8 +117,6 @@ public class ReportController extends BaseController{
 			}
 			retMap.put("fields", fieldList);
 			retMap.put("titles", titleList);
-			retMap.put("header", api.getUiHeader());
-			retMap.put("footer", api.getUiFooter());
 			
 		}
 		return retMap;
