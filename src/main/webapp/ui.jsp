@@ -30,7 +30,10 @@
 		var id = "${fileName}_${apiId}";
 		var table = null;
 		$(function(){
-			$.get("<sn:webroot />/report/ui",{apiId:"${apiId}",fileName:"${fileName}"},function(result){
+			var params = ${params!=null?params:"{}"};
+			params.apiId = "${apiId}";
+			params.fileName = "${fileName}";
+			$.get("<sn:webroot />/report/ui",params,function(result){
 				console.log(result.fields.length);
 				if(!result.res){
 					$("#"+id).html("<p>执行异常："+result.msg+"</p>");
@@ -41,16 +44,21 @@
 					var titles = result.titles;
 					var _columns = [];
 					$.each(fields,function(i,n){
-						_columns.push({title:titles[i], field:fields[i],hozAlign:"left"});
+						if(i ==0)
+							_columns.push({title:titles[i], field:fields[i],hozAlign:"left",formatter:"textarea",frozen:true});
+						else
+							_columns.push({title:titles[i], field:fields[i],hozAlign:"left",formatter:"textarea"});
 					});
 
 					table = new Tabulator("#"+id, {
+						height:"600px",
+						layout:"fitColumns",
 						columnHeaderHozAlign:"center",
 						cellHozAlign:"center",
 						cellVertAlign:"middle",
 					    layout:"fitColumns",
 					    placeholder:"查无数据",
-					    columns:_columns,
+					    columns:_columns
 					});
 					table.setData(result.result);
 					

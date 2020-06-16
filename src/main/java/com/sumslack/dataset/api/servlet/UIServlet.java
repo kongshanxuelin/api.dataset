@@ -1,13 +1,15 @@
 package com.sumslack.dataset.api.servlet;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSON;
 import com.sumscope.tag.rest.TagRest;
-import com.sumscope.tag.rest.servlet.AjaxServlet;
+import com.sumscope.tag.rest.servlet.AjaxServlet;import com.sumscope.tag.util.HttpUtils;
 import com.sumscope.tag.util.StrUtil;
 import com.sumslack.dataset.api.report.bean.ApiBean;
 import com.sumslack.dataset.api.report.util.ReportUtil;
@@ -36,6 +38,9 @@ public class UIServlet extends AjaxServlet{
 			request.setAttribute("uiHeader", Convert.toStr(api.getUiHeader(),""));
 			request.setAttribute("uiFooter", Convert.toStr(api.getUiFooter(),""));
 			request.setAttribute("uiJs", Convert.toStr(api.getUiJS(),""));
+			Map map = HttpUtils.getParamMap(request);
+			if(!map.isEmpty())
+				request.setAttribute("params",JSON.toJSONString(map));
 			request.getRequestDispatcher("/ui.jsp").forward(request, response);
 		}else {
 			request.setAttribute("msg", "无法在 【 "+fileName+".xml 】 配置文件中找到API节点【"+apiId+"】，请核查您的配置是否正确！");

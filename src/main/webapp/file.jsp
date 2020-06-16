@@ -89,12 +89,16 @@ li {
 				<ul >
 					<li>数据集report节点可通过 <a target="_blank" 
 							href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() +  "/report/id/"+ request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf(".")) +"/xxx" %>'> 
-							<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/report/id/"+request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf("."))+"/xxx" %>
-							</a> 访问，xxx是report节点id的值</li>
+							<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/report/id/"+request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf("."))+"/[REPORT ID]" %>
+							</a> 访问</li>
 					<li>接口api可通过 <a target="_blank" 
 							href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() +  "/api/id/"+ request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf(".")) +"/xxx" %>'> 
-							<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/api/id/"+request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf("."))+"/xxx" %>
-							</a> 访问，xxx是api节点id的值</li>
+							<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/api/id/"+request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf("."))+"/[API ID]" %>
+							</a> 访问</li>
+					<li>UI界面可通过 <a target="_blank" 
+							href='<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() +  "/ui/api/"+ request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf(".")) +"/xxx" %>'> 
+							<%="http://" + request.getLocalAddr() +":" + request.getLocalPort() + request.getContextPath() + "/ui/api/"+request.getAttribute("file").toString().substring(0,request.getAttribute("file").toString().lastIndexOf("."))+"/[API ID]" %>
+							</a> 访问</li>		
 				</ul>
 			</div>
 			<textarea id="code" name="code">${c.replaceAll("&","&amp;")}</textarea>
