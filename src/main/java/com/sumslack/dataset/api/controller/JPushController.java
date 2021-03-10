@@ -20,6 +20,9 @@ import cn.jpush.api.push.model.PushPayload;
 import cn.jpush.api.push.model.audience.Audience;
 import cn.jpush.api.push.model.notification.Notification;
 
+/**
+ * 极光推送整合
+ */
 @URIAlias(value = "jpush")
 public class JPushController extends BaseController{
 	private static JPushClient jpushClient = new JPushClient(
